@@ -383,6 +383,54 @@ svg {
   min-height: 310px;
 }
 
+.app-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 18px;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.62);
+  box-shadow: 0 14px 38px rgba(87, 57, 73, 0.1);
+  backdrop-filter: blur(18px);
+}
+
+.app-footer p {
+  margin: 0;
+  color: var(--muted);
+  font-weight: 750;
+}
+
+.app-footer strong {
+  color: var(--ink);
+}
+
+.repo-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 14px;
+  border: 1px solid rgba(39, 36, 49, 0.12);
+  border-radius: 8px;
+  color: #3f2630;
+  font-weight: 850;
+  text-decoration: none;
+  background: linear-gradient(135deg, rgba(255, 209, 102, 0.34), rgba(46, 196, 182, 0.18));
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    background 160ms ease;
+}
+
+.repo-link:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(87, 57, 73, 0.14);
+}
+
 .expense-list {
   display: grid;
   gap: 12px;
@@ -473,6 +521,15 @@ svg {
 
   .summary-grid {
     grid-template-columns: 1fr;
+  }
+
+  .app-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .repo-link {
+    width: 100%;
   }
 }
 
