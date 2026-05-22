@@ -32,7 +32,7 @@ const elements = {
 
 function loadState() {
   const fallback = {
-    people: ["Maya", "Lily"],
+    people: ["ellie", "bahar"],
     expenses: [],
   };
 
