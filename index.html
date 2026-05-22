@@ -87,7 +87,14 @@
 
           <form id="expense-form" class="expense-form">
             <label class="wide">
-              What was it?
+              Entry type
+              <select id="transaction-type" required>
+                <option value="expense">Shared expense</option>
+                <option value="payment">Roommate payment</option>
+              </select>
+            </label>
+            <label class="wide">
+              <span id="expense-title-label">What was it?</span>
               <input
                 id="expense-title"
                 type="text"
@@ -106,13 +113,17 @@
               Paid by
               <select id="expense-paid-by" required></select>
             </label>
+            <label id="expense-paid-to-field" class="is-hidden">
+              Paid to
+              <select id="expense-paid-to"></select>
+            </label>
             <label>
               Date
               <input id="expense-date" type="date" required />
             </label>
             <button class="primary-button add-button" type="submit">
               <i data-lucide="plus"></i>
-              Add expense
+              <span id="add-button-text">Add expense</span>
             </button>
           </form>
         </section>
@@ -130,13 +141,17 @@
             <p id="paid-b-label">Roommate 2 paid</p>
             <strong id="paid-b">$0.00</strong>
           </article>
+          <article class="mini-card lavender">
+            <p>Total roommate payments</p>
+            <strong id="total-payments">$0.00</strong>
+          </article>
         </section>
 
         <section class="panel list-panel" id="list-panel">
           <div class="panel-heading">
             <div>
               <p class="section-kicker">History</p>
-              <h2>Shared expenses</h2>
+              <h2>Shared expenses & payments</h2>
             </div>
             <button class="ghost-button" id="clear-all" type="button">
               <i data-lucide="trash-2"></i>

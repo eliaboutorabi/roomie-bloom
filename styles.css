@@ -255,6 +255,10 @@ select:focus {
   box-shadow: 0 0 0 4px rgba(46, 196, 182, 0.16);
 }
 
+.is-hidden {
+  display: none;
+}
+
 .money-input {
   position: relative;
 }
@@ -346,7 +350,7 @@ svg {
 
 .summary-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 14px;
 }
 
@@ -377,6 +381,10 @@ svg {
 
 .mini-card.yellow {
   background: linear-gradient(145deg, rgba(255, 209, 102, 0.42), rgba(255, 255, 255, 0.78));
+}
+
+.mini-card.lavender {
+  background: linear-gradient(145deg, rgba(205, 180, 219, 0.34), rgba(255, 255, 255, 0.78));
 }
 
 .list-panel {
@@ -455,6 +463,11 @@ svg {
   border-radius: 8px;
   color: #08665c;
   background: rgba(46, 196, 182, 0.14);
+}
+
+.payment-item .expense-icon {
+  color: #8d3b56;
+  background: rgba(255, 111, 145, 0.14);
 }
 
 .expense-item h3 {

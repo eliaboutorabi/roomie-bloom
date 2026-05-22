@@ -7,12 +7,17 @@ const elements = {
   roommatesForm: document.querySelector("#roommates-form"),
   personA: document.querySelector("#person-a"),
   personB: document.querySelector("#person-b"),
+  transactionType: document.querySelector("#transaction-type"),
   paidBy: document.querySelector("#expense-paid-by"),
+  paidTo: document.querySelector("#expense-paid-to"),
+  paidToField: document.querySelector("#expense-paid-to-field"),
   expenseForm: document.querySelector("#expense-form"),
   expenseTitle: document.querySelector("#expense-title"),
+  expenseTitleLabel: document.querySelector("#expense-title-label"),
   expenseAmount: document.querySelector("#expense-amount"),
   expenseDate: document.querySelector("#expense-date"),
   totalShared: document.querySelector("#total-shared"),
+  totalPayments: document.querySelector("#total-payments"),
   paidA: document.querySelector("#paid-a"),
   paidB: document.querySelector("#paid-b"),
   paidALabel: document.querySelector("#paid-a-label"),
@@ -65,37 +70,81 @@ function today() {
   return new Date().toISOString().slice(0, 10);
 }
 
+function isPayment(entry) {
+  return entry.type === "payment";
+}
+
 function totals() {
   const paid = Object.fromEntries(state.people.map((person) => [person, 0]));
-  const total = state.expenses.reduce((sum, expense) => {
-    paid[expense.paidBy] = (paid[expense.paidBy] || 0) + expense.amount;
-    return sum + expense.amount;
-  }, 0);
+  let total = 0;
+  let payments = 0;
+  let firstPaymentDelta = 0;
+
+  state.expenses.forEach((entry) => {
+    if (isPayment(entry)) {
+      payments += entry.amount;
+      if (entry.paidBy === state.people[0]) {
+        firstPaymentDelta += entry.amount;
+      }
+      if (entry.paidTo === state.people[0]) {
+        firstPaymentDelta -= entry.amount;
+      }
+      return;
+    }
+
+    paid[entry.paidBy] = (paid[entry.paidBy] || 0) + entry.amount;
+    total += entry.amount;
+  });
 
   const expectedShare = total / 2;
-  const firstDelta = paid[state.people[0]] - expectedShare;
-  return { total, paid, expectedShare, firstDelta };
+  const firstDelta = paid[state.people[0]] - expectedShare + firstPaymentDelta;
+  return { total, paid, payments, expectedShare, firstDelta };
+}
+
+function fillPersonSelect(select, people) {
+  select.replaceChildren();
+
+  people.forEach((person) => {
+    const option = document.createElement("option");
+    option.value = person;
+    option.textContent = person;
+    select.append(option);
+  });
+}
+
+function updatePaymentRecipient() {
+  const recipient = state.people.find((person) => person !== elements.paidBy.value) || state.people[1];
+  elements.paidTo.value = recipient;
+}
+
+function renderTransactionMode() {
+  const isPaymentMode = elements.transactionType.value === "payment";
+  elements.paidToField.classList.toggle("is-hidden", !isPaymentMode);
+  elements.paidTo.required = isPaymentMode;
+  elements.expenseTitleLabel.textContent = isPaymentMode ? "What is this payment for?" : "What was it?";
+  elements.expenseTitle.placeholder = isPaymentMode ? "Venmo payback, rent settle-up..." : "Groceries, candles, brunch...";
+  document.querySelector("#add-button-text").textContent = isPaymentMode ? "Add payment" : "Add expense";
+
+  if (isPaymentMode) {
+    updatePaymentRecipient();
+  }
 }
 
 function renderPeople() {
   elements.personA.value = state.people[0];
   elements.personB.value = state.people[1];
-  elements.paidBy.replaceChildren();
-
-  state.people.forEach((person) => {
-    const option = document.createElement("option");
-    option.value = person;
-    option.textContent = person;
-    elements.paidBy.append(option);
-  });
+  fillPersonSelect(elements.paidBy, state.people);
+  fillPersonSelect(elements.paidTo, state.people);
+  updatePaymentRecipient();
 
   elements.paidALabel.textContent = `${state.people[0]} paid`;
   elements.paidBLabel.textContent = `${state.people[1]} paid`;
 }
 
 function renderSummary() {
-  const { total, paid, firstDelta } = totals();
+  const { total, paid, payments, firstDelta } = totals();
   elements.totalShared.textContent = formatMoney(total);
+  elements.totalPayments.textContent = formatMoney(payments);
   elements.paidA.textContent = formatMoney(paid[state.people[0]] || 0);
   elements.paidB.textContent = formatMoney(paid[state.people[1]] || 0);
 
@@ -118,7 +167,7 @@ function renderExpenses() {
   if (!state.expenses.length) {
     const empty = document.createElement("div");
     empty.className = "empty-state";
-    empty.textContent = "No expenses yet. Add your first shared purchase above.";
+    empty.textContent = "No expenses or payments yet. Add the first entry above.";
     elements.expenseList.append(empty);
     return;
   }
@@ -129,9 +178,14 @@ function renderExpenses() {
     .forEach((expense) => {
       const item = elements.expenseTemplate.content.firstElementChild.cloneNode(true);
       item.dataset.id = expense.id;
-      item.querySelector("h3").textContent = expense.title;
-      item.querySelector("p").textContent = `Paid by ${expense.paidBy} on ${formatDate(expense.date)}`;
+      item.classList.toggle("payment-item", isPayment(expense));
+      item.querySelector(".expense-icon i").dataset.lucide = isPayment(expense) ? "hand-coins" : "receipt";
+      item.querySelector("h3").textContent = expense.title || (isPayment(expense) ? "Roommate payment" : "Shared expense");
+      item.querySelector("p").textContent = isPayment(expense)
+        ? `${expense.paidBy} paid ${expense.paidTo} on ${formatDate(expense.date)}`
+        : `Paid by ${expense.paidBy} on ${formatDate(expense.date)}`;
       item.querySelector("strong").textContent = formatMoney(expense.amount);
+      item.querySelector(".delete-expense").ariaLabel = isPayment(expense) ? "Delete payment" : "Delete expense";
       elements.expenseList.append(item);
     });
 
@@ -161,28 +215,40 @@ elements.roommatesForm.addEventListener("submit", (event) => {
     ...expense,
     paidBy:
       expense.paidBy === oldPeople[0] ? first : expense.paidBy === oldPeople[1] ? second : expense.paidBy,
+    paidTo:
+      expense.paidTo === oldPeople[0] ? first : expense.paidTo === oldPeople[1] ? second : expense.paidTo,
   }));
   render();
 });
 
 elements.expenseForm.addEventListener("submit", (event) => {
   event.preventDefault();
+  const type = elements.transactionType.value;
   const amount = Number(elements.expenseAmount.value);
   if (!Number.isFinite(amount) || amount <= 0) {
     return;
   }
 
-  state.expenses.push({
+  const entry = {
     id: crypto.randomUUID(),
+    type,
     title: elements.expenseTitle.value.trim(),
     amount,
     paidBy: elements.paidBy.value,
     date: elements.expenseDate.value,
     createdAt: Date.now(),
-  });
+  };
+
+  if (type === "payment") {
+    entry.paidTo = elements.paidTo.value;
+  }
+
+  state.expenses.push(entry);
 
   elements.expenseForm.reset();
+  elements.transactionType.value = "expense";
   elements.expenseDate.value = today();
+  renderTransactionMode();
   render();
 });
 
@@ -195,6 +261,13 @@ elements.expenseList.addEventListener("click", (event) => {
   const item = button.closest(".expense-item");
   state.expenses = state.expenses.filter((expense) => expense.id !== item.dataset.id);
   render();
+});
+
+elements.transactionType.addEventListener("change", renderTransactionMode);
+elements.paidBy.addEventListener("change", () => {
+  if (elements.transactionType.value === "payment") {
+    updatePaymentRecipient();
+  }
 });
 
 elements.clearAll.addEventListener("click", () => {
@@ -254,6 +327,7 @@ function runTour(force = false) {
 elements.restartTour.addEventListener("click", () => runTour(true));
 
 elements.expenseDate.value = today();
+renderTransactionMode();
 render();
 
 window.addEventListener("load", () => {
