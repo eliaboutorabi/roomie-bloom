@@ -41,6 +41,14 @@ function loadState() {
     if (!saved || !Array.isArray(saved.people) || !Array.isArray(saved.expenses)) {
       return fallback;
     }
+    if (saved.people[0] === "Maya" && saved.people[1] === "Lily") {
+      saved.people = fallback.people;
+      saved.expenses = saved.expenses.map((entry) => ({
+        ...entry,
+        paidBy: entry.paidBy === "Maya" ? fallback.people[0] : entry.paidBy === "Lily" ? fallback.people[1] : entry.paidBy,
+        paidTo: entry.paidTo === "Maya" ? fallback.people[0] : entry.paidTo === "Lily" ? fallback.people[1] : entry.paidTo,
+      }));
+    }
     return saved;
   } catch {
     return fallback;
