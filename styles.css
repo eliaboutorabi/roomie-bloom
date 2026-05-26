@@ -368,7 +368,11 @@ svg {
 }
 
 .mini-card strong {
-  font-size: clamp(1.45rem, 3vw, 2rem);
+  display: block;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  font-size: clamp(1.15rem, 2vw, 1.45rem);
+  line-height: 1.08;
 }
 
 .mini-card.coral {
