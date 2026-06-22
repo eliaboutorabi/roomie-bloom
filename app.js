@@ -32,7 +32,7 @@ const elements = {
 
 function loadState() {
   const fallback = {
-    people: ["ellie", "bahar"],
+    people: ["Eli", "bahar"],
     expenses: [],
   };
 
@@ -47,6 +47,14 @@ function loadState() {
         ...entry,
         paidBy: entry.paidBy === "Maya" ? fallback.people[0] : entry.paidBy === "Lily" ? fallback.people[1] : entry.paidBy,
         paidTo: entry.paidTo === "Maya" ? fallback.people[0] : entry.paidTo === "Lily" ? fallback.people[1] : entry.paidTo,
+      }));
+    }
+    if (saved.people[0] === "ellie") {
+      saved.people[0] = fallback.people[0];
+      saved.expenses = saved.expenses.map((entry) => ({
+        ...entry,
+        paidBy: entry.paidBy === "ellie" ? fallback.people[0] : entry.paidBy,
+        paidTo: entry.paidTo === "ellie" ? fallback.people[0] : entry.paidTo,
       }));
     }
     return saved;
