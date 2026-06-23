@@ -4,8 +4,8 @@
   --paper: #fffafb;
   --panel: rgba(255, 255, 255, 0.82);
   --line: rgba(39, 36, 49, 0.12);
-  --rose: #ff6f91;
-  --coral: #ff9671;
+  --rose: #ffd166;
+  --coral: #ffb84d;
   --teal: #2ec4b6;
   --mint: #b9fbc0;
   --yellow: #ffd166;
@@ -25,7 +25,7 @@ body {
   margin: 0;
   color: var(--ink);
   background:
-    linear-gradient(135deg, rgba(255, 111, 145, 0.18), transparent 34%),
+    linear-gradient(135deg, rgba(255, 209, 102, 0.24), transparent 34%),
     linear-gradient(225deg, rgba(46, 196, 182, 0.18), transparent 36%),
     linear-gradient(180deg, #fff7e8 0%, #fffafb 46%, #eefcf7 100%);
 }
@@ -66,7 +66,7 @@ button {
 .eyebrow,
 .section-kicker {
   margin: 0 0 7px;
-  color: #9b4d65;
+  color: #8a5a00;
   font-size: 0.76rem;
   font-weight: 800;
   letter-spacing: 0;
@@ -267,7 +267,7 @@ select:focus {
   position: absolute;
   left: 14px;
   top: 50%;
-  color: #9b4d65;
+  color: #8a5a00;
   font-weight: 900;
   transform: translateY(-50%);
 }
@@ -293,22 +293,22 @@ select:focus {
 }
 
 .primary-button {
-  color: #fff;
-  background: linear-gradient(135deg, #ff6f91, #ff9671 48%, #2ec4b6);
-  box-shadow: 0 12px 28px rgba(255, 111, 145, 0.28);
+  color: #3d2b00;
+  background: linear-gradient(135deg, #ffe29b, #ffd166 48%, #2ec4b6);
+  box-shadow: 0 12px 28px rgba(255, 193, 71, 0.3);
 }
 
 .ghost-button {
-  color: #8d3b56;
+  color: #7a4f00;
   padding: 0 14px;
-  background: rgba(255, 111, 145, 0.12);
+  background: rgba(255, 209, 102, 0.22);
 }
 
 .icon-button {
   flex: 0 0 auto;
   width: 44px;
   padding: 0;
-  color: #8d3b56;
+  color: #7a4f00;
   background: rgba(255, 255, 255, 0.72);
   border: 1px solid var(--line);
 }
@@ -376,7 +376,7 @@ svg {
 }
 
 .mini-card.coral {
-  background: linear-gradient(145deg, rgba(255, 150, 113, 0.34), rgba(255, 255, 255, 0.78));
+  background: linear-gradient(145deg, rgba(255, 209, 102, 0.56), rgba(255, 255, 255, 0.78));
 }
 
 .mini-card.teal {
@@ -470,8 +470,8 @@ svg {
 }
 
 .payment-item .expense-icon {
-  color: #8d3b56;
-  background: rgba(255, 111, 145, 0.14);
+  color: #7a4f00;
+  background: rgba(255, 209, 102, 0.24);
 }
 
 .expense-item h3 {
