@@ -249,6 +249,10 @@ select {
   outline: none;
 }
 
+input[type="checkbox"] {
+  min-height: 0;
+}
+
 input:focus,
 select:focus {
   border-color: var(--teal);
@@ -257,6 +261,21 @@ select:focus {
 
 .is-hidden {
   display: none;
+}
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  gap: 10px;
+  color: #7a4f00;
+  font-weight: 850;
+}
+
+.toggle-row input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--yellow);
 }
 
 .money-input {
@@ -484,6 +503,25 @@ svg {
   margin: 0;
   color: var(--muted);
   font-size: 0.86rem;
+}
+
+.reminder-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  margin-top: 7px;
+  padding: 5px 8px;
+  border-radius: 8px;
+  color: #6e4700;
+  font-size: 0.78rem;
+  font-weight: 850;
+  background: rgba(255, 209, 102, 0.28);
+}
+
+.reminder-pill.is-done {
+  color: #5e5765;
+  background: rgba(205, 180, 219, 0.22);
 }
 
 .expense-item strong {

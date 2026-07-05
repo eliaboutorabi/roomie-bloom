@@ -1,7 +1,10 @@
 const STORAGE_KEY = "roomie-bloom-state";
 const TOUR_KEY = "roomie-bloom-tour-complete";
+const REMINDER_CHECK_INTERVAL = 30_000;
+const MAX_TIMEOUT_DELAY = 2_147_483_647;
 
 const state = loadState();
+const reminderTimers = new Map();
 
 const elements = {
   roommatesForm: document.querySelector("#roommates-form"),
@@ -16,6 +19,9 @@ const elements = {
   expenseTitleLabel: document.querySelector("#expense-title-label"),
   expenseAmount: document.querySelector("#expense-amount"),
   expenseDate: document.querySelector("#expense-date"),
+  reminderToggle: document.querySelector("#set-reminder"),
+  reminderField: document.querySelector("#reminder-field"),
+  reminderAt: document.querySelector("#reminder-at"),
   totalShared: document.querySelector("#total-shared"),
   totalPayments: document.querySelector("#total-payments"),
   paidA: document.querySelector("#paid-a"),
@@ -86,8 +92,17 @@ function today() {
   return new Date().toISOString().slice(0, 10);
 }
 
+function toLocalDateTimeValue(date = new Date()) {
+  const offsetDate = new Date(date.getTime() - date.getTimezoneOffset() * 60_000);
+  return offsetDate.toISOString().slice(0, 16);
+}
+
 function isPayment(entry) {
   return entry.type === "payment";
+}
+
+function hasReminder(entry) {
+  return Number.isFinite(entry.reminderAt);
 }
 
 function totals() {
@@ -146,6 +161,16 @@ function renderTransactionMode() {
   }
 }
 
+function renderReminderMode() {
+  const enabled = elements.reminderToggle.checked;
+  elements.reminderField.classList.toggle("is-hidden", !enabled);
+  elements.reminderAt.required = enabled;
+
+  if (enabled && !elements.reminderAt.value) {
+    elements.reminderAt.value = toLocalDateTimeValue(new Date(Date.now() + 60 * 60_000));
+  }
+}
+
 function renderPeople() {
   elements.personA.value = state.people[0];
   elements.personB.value = state.people[1];
@@ -155,6 +180,15 @@ function renderPeople() {
 
   elements.paidALabel.textContent = `${state.people[0]} paid`;
   elements.paidBLabel.textContent = `${state.people[1]} paid`;
+}
+
+function formatReminderTime(value) {
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(new Date(value));
 }
 
 function renderSummary() {
@@ -200,6 +234,14 @@ function renderExpenses() {
       item.querySelector("p").textContent = isPayment(expense)
         ? `${expense.paidBy} paid ${expense.paidTo} on ${formatDate(expense.date)}`
         : `Paid by ${expense.paidBy} on ${formatDate(expense.date)}`;
+      if (hasReminder(expense)) {
+        const reminder = document.createElement("span");
+        reminder.className = `reminder-pill${expense.reminderDone ? " is-done" : ""}`;
+        reminder.innerHTML = `<i data-lucide="${expense.reminderDone ? "check" : "alarm-clock"}"></i> ${
+          expense.reminderDone ? "Alarm went off" : `Alarm ${formatReminderTime(expense.reminderAt)}`
+        }`;
+        item.querySelector("p").after(reminder);
+      }
       item.querySelector("strong").textContent = formatMoney(expense.amount);
       item.querySelector(".delete-expense").ariaLabel = isPayment(expense) ? "Delete payment" : "Delete expense";
       elements.expenseList.append(item);
@@ -214,6 +256,7 @@ function render() {
   renderPeople();
   renderSummary();
   renderExpenses();
+  scheduleReminders();
   saveState();
 
   if (window.lucide) {
@@ -259,12 +302,23 @@ elements.expenseForm.addEventListener("submit", (event) => {
     entry.paidTo = elements.paidTo.value;
   }
 
+  if (elements.reminderToggle.checked) {
+    const reminderAt = new Date(elements.reminderAt.value).getTime();
+    if (!Number.isFinite(reminderAt)) {
+      return;
+    }
+    entry.reminderAt = reminderAt;
+    entry.reminderDone = false;
+    requestNotificationPermission();
+  }
+
   state.expenses.push(entry);
 
   elements.expenseForm.reset();
   elements.transactionType.value = "expense";
   elements.expenseDate.value = today();
   renderTransactionMode();
+  renderReminderMode();
   render();
 });
 
@@ -280,6 +334,7 @@ elements.expenseList.addEventListener("click", (event) => {
 });
 
 elements.transactionType.addEventListener("change", renderTransactionMode);
+elements.reminderToggle.addEventListener("change", renderReminderMode);
 elements.paidBy.addEventListener("change", () => {
   if (elements.transactionType.value === "payment") {
     updatePaymentRecipient();
@@ -316,8 +371,8 @@ function runTour(force = false) {
       {
         element: "#expense-panel",
         popover: {
-          title: "Log each shared expense",
-          description: "Enter what it was, the amount, the date, and who paid at the register.",
+          title: "Log expenses and alarms",
+          description: "Enter what it was, the amount, who paid, and optionally set an alarm for a future reminder.",
         },
       },
       {
@@ -343,9 +398,66 @@ function runTour(force = false) {
 elements.restartTour.addEventListener("click", () => runTour(true));
 
 elements.expenseDate.value = today();
+elements.reminderAt.min = toLocalDateTimeValue();
 renderTransactionMode();
+renderReminderMode();
 render();
 
 window.addEventListener("load", () => {
   window.setTimeout(() => runTour(false), 450);
 });
+
+window.setInterval(checkReminders, REMINDER_CHECK_INTERVAL);
+
+function requestNotificationPermission() {
+  if (!("Notification" in window) || Notification.permission !== "default") {
+    return;
+  }
+  Notification.requestPermission();
+}
+
+function scheduleReminders() {
+  reminderTimers.forEach((timer) => window.clearTimeout(timer));
+  reminderTimers.clear();
+
+  const now = Date.now();
+  state.expenses.forEach((entry) => {
+    if (!hasReminder(entry) || entry.reminderDone || entry.reminderAt <= now) {
+      return;
+    }
+
+    const delay = Math.min(entry.reminderAt - now, MAX_TIMEOUT_DELAY);
+    reminderTimers.set(entry.id, window.setTimeout(checkReminders, delay));
+  });
+}
+
+function checkReminders() {
+  const dueReminders = state.expenses.filter(
+    (entry) => hasReminder(entry) && !entry.reminderDone && entry.reminderAt <= Date.now(),
+  );
+
+  if (!dueReminders.length) {
+    return;
+  }
+
+  dueReminders.forEach((entry) => {
+    entry.reminderDone = true;
+    showReminder(entry);
+  });
+  render();
+}
+
+function showReminder(entry) {
+  const title = entry.title || (isPayment(entry) ? "Roommate payment" : "Shared expense");
+  const message = `${title}: ${formatMoney(entry.amount)} ${isPayment(entry) ? "payment" : "expense"} is due now.`;
+
+  if ("Notification" in window && Notification.permission === "granted") {
+    new Notification("Roomie Bloom alarm", {
+      body: message,
+      icon: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23ffd166'/%3E%3Ctext x='32' y='42' font-size='34' text-anchor='middle'%3E%24%3C/text%3E%3C/svg%3E",
+    });
+    return;
+  }
+
+  window.alert(`Roomie Bloom alarm: ${message}`);
+}
