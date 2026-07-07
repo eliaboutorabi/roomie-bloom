@@ -1,6 +1,6 @@
 :root {
-  --ink: #272431;
-  --muted: #706878;
+  --ink: #000;
+  --muted: #000;
   --paper: #fffafb;
   --panel: rgba(255, 255, 255, 0.82);
   --line: rgba(39, 36, 49, 0.12);
@@ -66,7 +66,7 @@ button {
 .eyebrow,
 .section-kicker {
   margin: 0 0 7px;
-  color: #8a5a00;
+  color: #000;
   font-size: 0.76rem;
   font-weight: 800;
   letter-spacing: 0;
@@ -150,7 +150,7 @@ button {
   width: 76px;
   height: 76px;
   border-radius: 50%;
-  color: #7f4a00;
+  color: #000;
   font-size: 1.8rem;
   font-weight: 900;
   background: linear-gradient(145deg, #ffe29b, #ffb84d);
@@ -166,7 +166,7 @@ button {
   bottom: 18px;
   width: 58px;
   height: 58px;
-  color: #055a50;
+  color: #000;
   background: linear-gradient(145deg, #b9fbc0, #2ec4b6);
 }
 
@@ -268,7 +268,7 @@ select:focus {
   align-items: center;
   width: fit-content;
   gap: 10px;
-  color: #7a4f00;
+  color: #000;
   font-weight: 850;
 }
 
@@ -286,7 +286,7 @@ select:focus {
   position: absolute;
   left: 14px;
   top: 50%;
-  color: #8a5a00;
+  color: #000;
   font-weight: 900;
   transform: translateY(-50%);
 }
@@ -312,13 +312,13 @@ select:focus {
 }
 
 .primary-button {
-  color: #3d2b00;
+  color: #000;
   background: linear-gradient(135deg, #ffe29b, #ffd166 48%, #2ec4b6);
   box-shadow: 0 12px 28px rgba(255, 193, 71, 0.3);
 }
 
 .ghost-button {
-  color: #7a4f00;
+  color: #000;
   padding: 0 14px;
   background: rgba(255, 209, 102, 0.22);
 }
@@ -327,7 +327,7 @@ select:focus {
   flex: 0 0 auto;
   width: 44px;
   padding: 0;
-  color: #7a4f00;
+  color: #000;
   background: rgba(255, 255, 255, 0.72);
   border: 1px solid var(--line);
 }
@@ -350,7 +350,7 @@ svg {
   margin-top: 18px;
   padding: 18px;
   border-radius: 8px;
-  color: #4f2737;
+  color: #000;
   background:
     linear-gradient(135deg, rgba(255, 209, 102, 0.38), rgba(185, 251, 192, 0.42)),
     rgba(255, 255, 255, 0.72);
@@ -363,7 +363,7 @@ svg {
 
 .balance-card p:last-child {
   margin: 0;
-  color: #6a5561;
+  color: #000;
   line-height: 1.5;
 }
 
@@ -376,12 +376,12 @@ svg {
 .mini-card {
   min-height: 118px;
   padding: 18px;
-  color: #2f2630;
+  color: #000;
 }
 
 .mini-card p {
   margin-bottom: 12px;
-  color: rgba(47, 38, 48, 0.72);
+  color: #000;
   font-size: 0.86rem;
   font-weight: 800;
 }
@@ -447,7 +447,7 @@ svg {
   padding: 0 14px;
   border: 1px solid rgba(39, 36, 49, 0.12);
   border-radius: 8px;
-  color: #3f2630;
+  color: #000;
   font-weight: 850;
   text-decoration: none;
   background: linear-gradient(135deg, rgba(255, 209, 102, 0.34), rgba(46, 196, 182, 0.18));
@@ -484,12 +484,12 @@ svg {
   width: 46px;
   height: 46px;
   border-radius: 8px;
-  color: #08665c;
+  color: #000;
   background: rgba(46, 196, 182, 0.14);
 }
 
 .payment-item .expense-icon {
-  color: #7a4f00;
+  color: #000;
   background: rgba(255, 209, 102, 0.24);
 }
 
@@ -513,14 +513,14 @@ svg {
   margin-top: 7px;
   padding: 5px 8px;
   border-radius: 8px;
-  color: #6e4700;
+  color: #000;
   font-size: 0.78rem;
   font-weight: 850;
   background: rgba(255, 209, 102, 0.28);
 }
 
 .reminder-pill.is-done {
-  color: #5e5765;
+  color: #000;
   background: rgba(205, 180, 219, 0.22);
 }
 
