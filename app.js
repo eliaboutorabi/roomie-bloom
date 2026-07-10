@@ -2,6 +2,7 @@ const STORAGE_KEY = "roomie-bloom-state";
 const TOUR_KEY = "roomie-bloom-tour-complete";
 const REMINDER_CHECK_INTERVAL = 30_000;
 const MAX_TIMEOUT_DELAY = 2_147_483_647;
+const MAX_RECEIPT_SIZE = 1_500_000;
 
 const state = loadState();
 const reminderTimers = new Map();
@@ -19,6 +20,7 @@ const elements = {
   expenseTitleLabel: document.querySelector("#expense-title-label"),
   expenseAmount: document.querySelector("#expense-amount"),
   expenseDate: document.querySelector("#expense-date"),
+  receiptFile: document.querySelector("#receipt-file"),
   reminderToggle: document.querySelector("#set-reminder"),
   reminderField: document.querySelector("#reminder-field"),
   reminderAt: document.querySelector("#reminder-at"),
@@ -103,6 +105,10 @@ function isPayment(entry) {
 
 function hasReminder(entry) {
   return Number.isFinite(entry.reminderAt);
+}
+
+function hasReceipt(entry) {
+  return Boolean(entry.receipt && entry.receipt.dataUrl);
 }
 
 function totals() {
@@ -191,6 +197,30 @@ function formatReminderTime(value) {
   }).format(new Date(value));
 }
 
+function readReceiptAttachment(file) {
+  if (!file) {
+    return Promise.resolve(null);
+  }
+
+  if (file.size > MAX_RECEIPT_SIZE) {
+    window.alert("Please attach a receipt smaller than 1.5 MB so it can be saved in this browser.");
+    return Promise.resolve(null);
+  }
+
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.addEventListener("load", () => {
+      resolve({
+        name: file.name,
+        type: file.type || "application/octet-stream",
+        dataUrl: reader.result,
+      });
+    });
+    reader.addEventListener("error", () => reject(reader.error));
+    reader.readAsDataURL(file);
+  });
+}
+
 function renderSummary() {
   const { total, paid, payments, firstDelta } = totals();
   elements.totalShared.textContent = formatMoney(total);
@@ -242,6 +272,29 @@ function renderExpenses() {
         }`;
         item.querySelector("p").after(reminder);
       }
+      if (hasReceipt(expense)) {
+        const receipt = document.createElement("a");
+        receipt.className = "receipt-archive";
+        receipt.href = expense.receipt.dataUrl;
+        receipt.target = "_blank";
+        receipt.rel = "noreferrer";
+        receipt.download = expense.receipt.name || "receipt";
+        const receiptText = document.createElement("span");
+
+        if (expense.receipt.type.startsWith("image/")) {
+          const thumbnail = document.createElement("img");
+          thumbnail.src = expense.receipt.dataUrl;
+          thumbnail.alt = "";
+          receipt.append(thumbnail);
+          receiptText.innerHTML = `<i data-lucide="archive"></i> Receipt archived`;
+        } else {
+          receiptText.innerHTML = `<i data-lucide="file-text"></i> `;
+          receiptText.append(expense.receipt.name || "Receipt archived");
+        }
+
+        receipt.append(receiptText);
+        item.querySelector("p").after(receipt);
+      }
       item.querySelector("strong").textContent = formatMoney(expense.amount);
       item.querySelector(".delete-expense").ariaLabel = isPayment(expense) ? "Delete payment" : "Delete expense";
       elements.expenseList.append(item);
@@ -280,7 +333,7 @@ elements.roommatesForm.addEventListener("submit", (event) => {
   render();
 });
 
-elements.expenseForm.addEventListener("submit", (event) => {
+elements.expenseForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const type = elements.transactionType.value;
   const amount = Number(elements.expenseAmount.value);
@@ -310,6 +363,17 @@ elements.expenseForm.addEventListener("submit", (event) => {
     entry.reminderAt = reminderAt;
     entry.reminderDone = false;
     requestNotificationPermission();
+  }
+
+  let receipt = null;
+  try {
+    receipt = await readReceiptAttachment(elements.receiptFile.files[0]);
+  } catch {
+    window.alert("The receipt could not be attached. Please try a different file.");
+    return;
+  }
+  if (receipt) {
+    entry.receipt = receipt;
   }
 
   state.expenses.push(entry);
@@ -372,7 +436,7 @@ function runTour(force = false) {
         element: "#expense-panel",
         popover: {
           title: "Log expenses and alarms",
-          description: "Enter what it was, the amount, who paid, and optionally set an alarm for a future reminder.",
+          description: "Enter what it was, the amount, who paid, attach a receipt, and optionally set an alarm.",
         },
       },
       {

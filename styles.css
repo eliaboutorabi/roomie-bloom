@@ -319,6 +319,24 @@ input[type="checkbox"] {
   min-height: 0;
 }
 
+input[type="file"] {
+  min-height: auto;
+  padding: 12px;
+}
+
+input[type="file"]::file-selector-button {
+  min-height: 36px;
+  margin-right: 12px;
+  border: 0;
+  border-radius: 8px;
+  padding: 0 12px;
+  color: #000;
+  font: inherit;
+  font-weight: 850;
+  background: linear-gradient(135deg, rgba(255, 209, 102, 0.7), rgba(46, 196, 182, 0.22));
+  cursor: pointer;
+}
+
 input:focus,
 select:focus {
   border-color: var(--teal);
@@ -599,6 +617,36 @@ svg {
 .reminder-pill.is-done {
   color: #000;
   background: rgba(205, 180, 219, 0.22);
+}
+
+.receipt-archive {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  max-width: 100%;
+  margin-top: 8px;
+  padding: 6px 8px;
+  border: 1px solid rgba(39, 36, 49, 0.1);
+  border-radius: 8px;
+  color: #000;
+  font-size: 0.8rem;
+  font-weight: 850;
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.receipt-archive img {
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.receipt-archive span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .expense-item strong {
