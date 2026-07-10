@@ -6,6 +6,7 @@ const MAX_RECEIPT_SIZE = 1_500_000;
 
 const state = loadState();
 const reminderTimers = new Map();
+let editingExpenseId = null;
 
 const elements = {
   roommatesForm: document.querySelector("#roommates-form"),
@@ -35,6 +36,7 @@ const elements = {
   expenseList: document.querySelector("#expense-list"),
   expenseTemplate: document.querySelector("#expense-template"),
   clearAll: document.querySelector("#clear-all"),
+  cancelEdit: document.querySelector("#cancel-edit"),
   restartTour: document.querySelector("#restart-tour"),
 };
 
@@ -139,6 +141,7 @@ function totals() {
 }
 
 function fillPersonSelect(select, people) {
+  const selectedValue = select.value;
   select.replaceChildren();
 
   people.forEach((person) => {
@@ -147,6 +150,10 @@ function fillPersonSelect(select, people) {
     option.textContent = person;
     select.append(option);
   });
+
+  if (people.includes(selectedValue)) {
+    select.value = selectedValue;
+  }
 }
 
 function updatePaymentRecipient() {
@@ -160,7 +167,11 @@ function renderTransactionMode() {
   elements.paidTo.required = isPaymentMode;
   elements.expenseTitleLabel.textContent = isPaymentMode ? "What is this payment for?" : "What was it?";
   elements.expenseTitle.placeholder = isPaymentMode ? "Venmo payback, rent settle-up..." : "Groceries, candles, brunch...";
-  document.querySelector("#add-button-text").textContent = isPaymentMode ? "Add payment" : "Add expense";
+  document.querySelector("#add-button-text").textContent = editingExpenseId
+    ? "Save changes"
+    : isPaymentMode
+      ? "Add payment"
+      : "Add expense";
 
   if (isPaymentMode) {
     updatePaymentRecipient();
@@ -175,6 +186,11 @@ function renderReminderMode() {
   if (enabled && !elements.reminderAt.value) {
     elements.reminderAt.value = toLocalDateTimeValue(new Date(Date.now() + 60 * 60_000));
   }
+}
+
+function renderEditMode() {
+  elements.cancelEdit.classList.toggle("is-hidden", !editingExpenseId);
+  renderTransactionMode();
 }
 
 function renderPeople() {
@@ -258,6 +274,7 @@ function renderExpenses() {
     .forEach((expense) => {
       const item = elements.expenseTemplate.content.firstElementChild.cloneNode(true);
       item.dataset.id = expense.id;
+      item.classList.toggle("is-editing", expense.id === editingExpenseId);
       item.classList.toggle("payment-item", isPayment(expense));
       item.querySelector(".expense-icon i").dataset.lucide = isPayment(expense) ? "hand-coins" : "receipt";
       item.querySelector("h3").textContent = expense.title || (isPayment(expense) ? "Roommate payment" : "Shared expense");
@@ -296,6 +313,7 @@ function renderExpenses() {
         item.querySelector("p").after(receipt);
       }
       item.querySelector("strong").textContent = formatMoney(expense.amount);
+      item.querySelector(".edit-expense").ariaLabel = isPayment(expense) ? "Edit payment" : "Edit expense";
       item.querySelector(".delete-expense").ariaLabel = isPayment(expense) ? "Delete payment" : "Delete expense";
       elements.expenseList.append(item);
     });
@@ -309,6 +327,7 @@ function render() {
   renderPeople();
   renderSummary();
   renderExpenses();
+  renderEditMode();
   scheduleReminders();
   saveState();
 
@@ -333,6 +352,38 @@ elements.roommatesForm.addEventListener("submit", (event) => {
   render();
 });
 
+function resetExpenseForm() {
+  editingExpenseId = null;
+  elements.expenseForm.reset();
+  elements.transactionType.value = "expense";
+  elements.expenseDate.value = today();
+  renderTransactionMode();
+  renderReminderMode();
+  renderEditMode();
+}
+
+function startEditingExpense(expense) {
+  editingExpenseId = expense.id;
+  elements.transactionType.value = expense.type || "expense";
+  elements.expenseTitle.value = expense.title || "";
+  elements.expenseAmount.value = expense.amount;
+  elements.paidBy.value = expense.paidBy;
+  elements.expenseDate.value = expense.date;
+  renderTransactionMode();
+
+  if (isPayment(expense)) {
+    elements.paidTo.value = expense.paidTo || state.people.find((person) => person !== expense.paidBy) || state.people[1];
+  }
+
+  elements.reminderToggle.checked = hasReminder(expense) && !expense.reminderDone;
+  elements.reminderAt.value = hasReminder(expense) && !expense.reminderDone ? toLocalDateTimeValue(new Date(expense.reminderAt)) : "";
+  renderReminderMode();
+  renderEditMode();
+  render();
+  elements.expenseForm.scrollIntoView({ behavior: "smooth", block: "start" });
+  elements.expenseTitle.focus();
+}
+
 elements.expenseForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const type = elements.transactionType.value;
@@ -342,13 +393,15 @@ elements.expenseForm.addEventListener("submit", async (event) => {
   }
 
   const entry = {
-    id: crypto.randomUUID(),
+    id: editingExpenseId || crypto.randomUUID(),
     type,
     title: elements.expenseTitle.value.trim(),
     amount,
     paidBy: elements.paidBy.value,
     date: elements.expenseDate.value,
-    createdAt: Date.now(),
+    createdAt: editingExpenseId
+      ? state.expenses.find((expense) => expense.id === editingExpenseId)?.createdAt || Date.now()
+      : Date.now(),
   };
 
   if (type === "payment") {
@@ -365,6 +418,7 @@ elements.expenseForm.addEventListener("submit", async (event) => {
     requestNotificationPermission();
   }
 
+  const currentEntry = editingExpenseId ? state.expenses.find((expense) => expense.id === editingExpenseId) : null;
   let receipt = null;
   try {
     receipt = await readReceiptAttachment(elements.receiptFile.files[0]);
@@ -374,19 +428,31 @@ elements.expenseForm.addEventListener("submit", async (event) => {
   }
   if (receipt) {
     entry.receipt = receipt;
+  } else if (currentEntry && hasReceipt(currentEntry)) {
+    entry.receipt = currentEntry.receipt;
   }
 
-  state.expenses.push(entry);
+  if (editingExpenseId) {
+    state.expenses = state.expenses.map((expense) => (expense.id === editingExpenseId ? entry : expense));
+  } else {
+    state.expenses.push(entry);
+  }
 
-  elements.expenseForm.reset();
-  elements.transactionType.value = "expense";
-  elements.expenseDate.value = today();
-  renderTransactionMode();
-  renderReminderMode();
+  resetExpenseForm();
   render();
 });
 
 elements.expenseList.addEventListener("click", (event) => {
+  const editButton = event.target.closest(".edit-expense");
+  if (editButton) {
+    const item = editButton.closest(".expense-item");
+    const expense = state.expenses.find((entry) => entry.id === item.dataset.id);
+    if (expense) {
+      startEditingExpense(expense);
+    }
+    return;
+  }
+
   const button = event.target.closest(".delete-expense");
   if (!button) {
     return;
@@ -394,6 +460,9 @@ elements.expenseList.addEventListener("click", (event) => {
 
   const item = button.closest(".expense-item");
   state.expenses = state.expenses.filter((expense) => expense.id !== item.dataset.id);
+  if (editingExpenseId === item.dataset.id) {
+    resetExpenseForm();
+  }
   render();
 });
 
@@ -410,6 +479,12 @@ elements.clearAll.addEventListener("click", () => {
     return;
   }
   state.expenses = [];
+  resetExpenseForm();
+  render();
+});
+
+elements.cancelEdit.addEventListener("click", () => {
+  resetExpenseForm();
   render();
 });
 
@@ -444,6 +519,13 @@ function runTour(force = false) {
         popover: {
           title: "See the totals instantly",
           description: "These cards update as soon as you add, delete, or clear expenses.",
+        },
+      },
+      {
+        element: "#list-panel",
+        popover: {
+          title: "Review and edit history",
+          description: "Use the history list to edit or delete recent expenses, payments, and receipt attachments.",
         },
       },
       {
