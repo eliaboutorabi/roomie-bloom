@@ -13,11 +13,14 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/driver.js@1.3.6/dist/driver.css"
     />
-    <link rel="stylesheet" href="./styles.css?v=edit-expenses" />
+    <link rel="stylesheet" href="./styles.css?v=theme-toggle" />
   </head>
   <body>
     <main class="app-shell">
       <section class="hero" aria-labelledby="app-title">
+        <button class="icon-button theme-toggle" type="button" id="theme-toggle" aria-label="Toggle color theme">
+          <i data-lucide="moon"></i>
+        </button>
         <div class="hero-copy">
           <p class="eyebrow">Shared life, simpler money</p>
           <h1 id="app-title">Roomie Bloom</h1>
@@ -255,6 +258,6 @@
 
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/driver.js@1.3.6/dist/driver.js.iife.js"></script>
-    <script src="./app.js?v=edit-expenses"></script>
+    <script src="./app.js?v=theme-toggle"></script>
   </body>
 </html>

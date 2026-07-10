@@ -1,5 +1,6 @@
 const STORAGE_KEY = "roomie-bloom-state";
 const TOUR_KEY = "roomie-bloom-tour-complete";
+const THEME_KEY = "roomie-bloom-theme";
 const REMINDER_CHECK_INTERVAL = 30_000;
 const MAX_TIMEOUT_DELAY = 2_147_483_647;
 const MAX_RECEIPT_SIZE = 1_500_000;
@@ -37,8 +38,24 @@ const elements = {
   expenseTemplate: document.querySelector("#expense-template"),
   clearAll: document.querySelector("#clear-all"),
   cancelEdit: document.querySelector("#cancel-edit"),
+  themeToggle: document.querySelector("#theme-toggle"),
   restartTour: document.querySelector("#restart-tour"),
 };
+
+function applyTheme(theme) {
+  const isDark = theme === "dark";
+  document.body.classList.toggle("is-dark", isDark);
+  elements.themeToggle.setAttribute("aria-pressed", String(isDark));
+  elements.themeToggle.querySelector("i").dataset.lucide = isDark ? "sun" : "moon";
+
+  if (window.lucide) {
+    window.lucide.createIcons();
+  }
+}
+
+function savedTheme() {
+  return localStorage.getItem(THEME_KEY) || "light";
+}
 
 function loadState() {
   const fallback = {
@@ -488,6 +505,12 @@ elements.cancelEdit.addEventListener("click", () => {
   render();
 });
 
+elements.themeToggle.addEventListener("click", () => {
+  const nextTheme = document.body.classList.contains("is-dark") ? "light" : "dark";
+  localStorage.setItem(THEME_KEY, nextTheme);
+  applyTheme(nextTheme);
+});
+
 function runTour(force = false) {
   if (!window.driver || (!force && localStorage.getItem(TOUR_KEY))) {
     return;
@@ -545,6 +568,7 @@ elements.restartTour.addEventListener("click", () => runTour(true));
 
 elements.expenseDate.value = today();
 elements.reminderAt.min = toLocalDateTimeValue();
+applyTheme(savedTheme());
 renderTransactionMode();
 renderReminderMode();
 render();
