@@ -217,7 +217,7 @@ function renderExpenses() {
   if (!state.expenses.length) {
     const empty = document.createElement("div");
     empty.className = "empty-state";
-    empty.textContent = "No expenses or payments yet. Add the first entry above.";
+    empty.innerHTML = `<i data-lucide="sparkles"></i><span>No expenses or payments yet. Add the first entry above.</span>`;
     elements.expenseList.append(empty);
     return;
   }
