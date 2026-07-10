@@ -74,10 +74,10 @@ button {
 }
 
 .hero h1 {
-  max-width: 9ch;
+  max-width: 12ch;
   margin: 0;
-  font-size: clamp(3.3rem, 10vw, 7.2rem);
-  line-height: 0.86;
+  font-size: clamp(2.4rem, 6vw, 4.6rem);
+  line-height: 0.95;
   letter-spacing: 0;
 }
 
