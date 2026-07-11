@@ -120,7 +120,7 @@ button {
   place-items: center;
 }
 
-.shopping-invoice {
+.utility-bill {
   position: relative;
   width: min(100%, 340px);
   padding: 24px;
@@ -129,7 +129,7 @@ button {
   color: #000;
   background:
     linear-gradient(180deg, #fff 0 0) padding-box,
-    repeating-linear-gradient(135deg, rgba(255, 209, 102, 0.46) 0 10px, rgba(46, 196, 182, 0.28) 10px 20px)
+    repeating-linear-gradient(135deg, rgba(255, 209, 102, 0.5) 0 10px, rgba(46, 196, 182, 0.18) 10px 20px)
       border-box;
   box-shadow: 0 22px 58px rgba(55, 38, 49, 0.2);
 }
@@ -140,15 +140,15 @@ body.is-dark .hero {
     radial-gradient(circle at 78% 22%, rgba(255, 209, 102, 0.24), transparent 34%);
 }
 
-body.is-dark .shopping-invoice {
+body.is-dark .utility-bill {
   color: #000;
   background:
     linear-gradient(180deg, #fff7df 0 0) padding-box,
-    repeating-linear-gradient(135deg, rgba(255, 209, 102, 0.58) 0 10px, rgba(46, 196, 182, 0.34) 10px 20px)
+    repeating-linear-gradient(135deg, rgba(255, 209, 102, 0.62) 0 10px, rgba(46, 196, 182, 0.26) 10px 20px)
       border-box;
 }
 
-.shopping-invoice::after {
+.utility-bill::after {
   content: "";
   position: absolute;
   right: 0;
@@ -159,12 +159,12 @@ body.is-dark .shopping-invoice {
   background-size: 20px 18px;
 }
 
-body.is-dark .shopping-invoice::after {
+body.is-dark .utility-bill::after {
   background: radial-gradient(circle at 10px 12px, transparent 9px, #fff7df 10px) repeat-x;
   background-size: 20px 18px;
 }
 
-.invoice-pin {
+.bill-pin {
   position: absolute;
   top: -14px;
   left: 50%;
@@ -176,68 +176,81 @@ body.is-dark .shopping-invoice::after {
   transform: translateX(-50%) rotate(-2deg);
 }
 
-.invoice-head,
-.invoice-lines div,
-.invoice-total {
+.bill-head,
+.bill-lines div,
+.bill-total {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
 }
 
-.invoice-head {
+.bill-head {
   padding-bottom: 16px;
   border-bottom: 1px dashed rgba(39, 36, 49, 0.18);
 }
 
-.invoice-head span,
-.invoice-lines span,
-.invoice-total span {
+.bill-head span,
+.bill-lines span,
+.bill-total span {
   font-size: 0.82rem;
   font-weight: 850;
   text-transform: uppercase;
 }
 
-.invoice-head strong {
+.bill-head strong {
   display: block;
   margin-top: 4px;
   font-size: 1.4rem;
 }
 
-.invoice-head svg {
+.bill-head svg {
   width: 42px;
   height: 42px;
   padding: 8px;
   border-radius: 8px;
-  background: rgba(255, 209, 102, 0.32);
+  background: linear-gradient(135deg, rgba(255, 209, 102, 0.55), rgba(46, 196, 182, 0.2));
 }
 
-.invoice-lines {
+.bill-lines {
   display: grid;
   gap: 12px;
   padding: 18px 0;
 }
 
-.invoice-lines div {
+.bill-lines div {
   min-height: 28px;
 }
 
-.invoice-lines strong,
-.invoice-total strong {
+.bill-lines strong,
+.bill-total strong {
   font-size: 1rem;
 }
 
-.invoice-total {
+.bill-total {
   padding: 14px;
   border-radius: 8px;
   background: linear-gradient(135deg, rgba(255, 209, 102, 0.4), rgba(46, 196, 182, 0.18));
 }
 
-.invoice-total strong {
+.bill-total strong {
   font-size: 1.45rem;
 }
 
-.invoice-barcode {
+.meter-row {
+  display: grid;
+  grid-template-columns: 1.1fr 0.8fr 1.4fr 0.7fr;
+  gap: 6px;
+  height: 12px;
+  margin-top: 16px;
+}
+
+.meter-row span {
+  border-radius: 999px;
+  background: linear-gradient(90deg, #2ec4b6, #ffd166);
+}
+
+.bill-barcode {
   display: flex;
   align-items: stretch;
   justify-content: center;
@@ -246,18 +259,18 @@ body.is-dark .shopping-invoice::after {
   margin-top: 18px;
 }
 
-.invoice-barcode span {
+.bill-barcode span {
   width: 8px;
   border-radius: 999px;
   background: #000;
 }
 
-.invoice-barcode span:nth-child(2),
-.invoice-barcode span:nth-child(5) {
+.bill-barcode span:nth-child(2),
+.bill-barcode span:nth-child(5) {
   width: 14px;
 }
 
-.invoice-barcode span:nth-child(3) {
+.bill-barcode span:nth-child(3) {
   width: 5px;
 }
 
@@ -815,7 +828,7 @@ body.is-dark .mini-card.lavender {
     min-height: 190px;
   }
 
-  .shopping-invoice {
+  .utility-bill {
     width: min(300px, 88vw);
     padding: 20px;
   }
