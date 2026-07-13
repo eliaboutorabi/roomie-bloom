@@ -120,18 +120,18 @@ button {
   place-items: center;
 }
 
-.utility-bill {
+.bill-photo-card {
   position: relative;
   width: min(100%, 340px);
-  padding: 24px;
+  aspect-ratio: 4 / 5;
+  margin: 0;
+  padding: 10px;
+  overflow: hidden;
   border: 1px solid rgba(39, 36, 49, 0.1);
-  border-radius: 8px 8px 18px 18px;
-  color: #000;
-  background:
-    linear-gradient(180deg, #fff 0 0) padding-box,
-    repeating-linear-gradient(135deg, rgba(255, 209, 102, 0.5) 0 10px, rgba(46, 196, 182, 0.18) 10px 20px)
-      border-box;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #ffd166, #fff8d4 46%, #2ec4b6);
   box-shadow: 0 22px 58px rgba(55, 38, 49, 0.2);
+  transform: rotate(1.5deg);
 }
 
 body.is-dark .hero {
@@ -140,138 +140,28 @@ body.is-dark .hero {
     radial-gradient(circle at 78% 22%, rgba(255, 209, 102, 0.24), transparent 34%);
 }
 
-body.is-dark .utility-bill {
-  color: #000;
-  background:
-    linear-gradient(180deg, #fff7df 0 0) padding-box,
-    repeating-linear-gradient(135deg, rgba(255, 209, 102, 0.62) 0 10px, rgba(46, 196, 182, 0.26) 10px 20px)
-      border-box;
+body.is-dark .bill-photo-card {
+  border-color: rgba(255, 255, 255, 0.14);
+  background: linear-gradient(135deg, #ffd166, #2ec4b6);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.34);
 }
 
-.utility-bill::after {
+.bill-photo-card::before {
   content: "";
   position: absolute;
-  right: 0;
-  bottom: -12px;
-  left: 0;
-  height: 18px;
-  background: radial-gradient(circle at 10px 12px, transparent 9px, #fff 10px) repeat-x;
-  background-size: 20px 18px;
+  inset: 10px;
+  z-index: 1;
+  border-radius: 12px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28);
+  pointer-events: none;
 }
 
-body.is-dark .utility-bill::after {
-  background: radial-gradient(circle at 10px 12px, transparent 9px, #fff7df 10px) repeat-x;
-  background-size: 20px 18px;
-}
-
-.bill-pin {
-  position: absolute;
-  top: -14px;
-  left: 50%;
-  width: 72px;
-  height: 28px;
-  border-radius: 999px;
-  background: linear-gradient(135deg, #ffd166, #2ec4b6);
-  box-shadow: 0 12px 28px rgba(55, 38, 49, 0.14);
-  transform: translateX(-50%) rotate(-2deg);
-}
-
-.bill-head,
-.bill-lines div,
-.bill-total {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-.bill-head {
-  padding-bottom: 16px;
-  border-bottom: 1px dashed rgba(39, 36, 49, 0.18);
-}
-
-.bill-head span,
-.bill-lines span,
-.bill-total span {
-  font-size: 0.82rem;
-  font-weight: 850;
-  text-transform: uppercase;
-}
-
-.bill-head strong {
+.bill-photo-card img {
+  width: 100%;
+  height: 100%;
   display: block;
-  margin-top: 4px;
-  font-size: 1.4rem;
-}
-
-.bill-head svg {
-  width: 42px;
-  height: 42px;
-  padding: 8px;
-  border-radius: 8px;
-  background: linear-gradient(135deg, rgba(255, 209, 102, 0.55), rgba(46, 196, 182, 0.2));
-}
-
-.bill-lines {
-  display: grid;
-  gap: 12px;
-  padding: 18px 0;
-}
-
-.bill-lines div {
-  min-height: 28px;
-}
-
-.bill-lines strong,
-.bill-total strong {
-  font-size: 1rem;
-}
-
-.bill-total {
-  padding: 14px;
-  border-radius: 8px;
-  background: linear-gradient(135deg, rgba(255, 209, 102, 0.4), rgba(46, 196, 182, 0.18));
-}
-
-.bill-total strong {
-  font-size: 1.45rem;
-}
-
-.meter-row {
-  display: grid;
-  grid-template-columns: 1.1fr 0.8fr 1.4fr 0.7fr;
-  gap: 6px;
-  height: 12px;
-  margin-top: 16px;
-}
-
-.meter-row span {
-  border-radius: 999px;
-  background: linear-gradient(90deg, #2ec4b6, #ffd166);
-}
-
-.bill-barcode {
-  display: flex;
-  align-items: stretch;
-  justify-content: center;
-  gap: 5px;
-  height: 34px;
-  margin-top: 18px;
-}
-
-.bill-barcode span {
-  width: 8px;
-  border-radius: 999px;
-  background: #000;
-}
-
-.bill-barcode span:nth-child(2),
-.bill-barcode span:nth-child(5) {
-  width: 14px;
-}
-
-.bill-barcode span:nth-child(3) {
-  width: 5px;
+  object-fit: cover;
+  border-radius: 12px;
 }
 
 .workspace {
@@ -828,9 +718,10 @@ body.is-dark .mini-card.lavender {
     min-height: 190px;
   }
 
-  .utility-bill {
+  .bill-photo-card {
     width: min(300px, 88vw);
-    padding: 20px;
+    padding: 8px;
+    transform: none;
   }
 
   .setup-panel {
