@@ -13,7 +13,7 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/driver.js@1.3.6/dist/driver.css"
     />
-    <link rel="stylesheet" href="./styles.css?v=group-invites" />
+    <link rel="stylesheet" href="./styles.css?v=history-search" />
   </head>
   <body>
     <main class="app-shell">
@@ -215,6 +215,13 @@
               Clear
             </button>
           </div>
+          <label class="search-box" for="history-search">
+            <i data-lucide="search"></i>
+            <input id="history-search" type="search" placeholder="Search history..." autocomplete="off" />
+            <button class="icon-button clear-search is-hidden" id="clear-search" type="button" aria-label="Clear search">
+              <i data-lucide="x"></i>
+            </button>
+          </label>
           <div class="expense-list" id="expense-list" aria-live="polite"></div>
         </section>
       </section>
@@ -259,6 +266,6 @@
 
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/driver.js@1.3.6/dist/driver.js.iife.js"></script>
-    <script src="./app.js?v=group-invites"></script>
+    <script src="./app.js?v=history-search"></script>
   </body>
 </html>

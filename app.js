@@ -36,6 +36,8 @@ const elements = {
   balanceDetail: document.querySelector("#balance-detail"),
   expenseList: document.querySelector("#expense-list"),
   expenseTemplate: document.querySelector("#expense-template"),
+  historySearch: document.querySelector("#history-search"),
+  clearSearch: document.querySelector("#clear-search"),
   clearAll: document.querySelector("#clear-all"),
   cancelEdit: document.querySelector("#cancel-edit"),
   themeToggle: document.querySelector("#theme-toggle"),
@@ -165,6 +167,31 @@ function hasReminder(entry) {
 
 function hasReceipt(entry) {
   return Boolean(entry.receipt && entry.receipt.dataUrl);
+}
+
+function expenseMatchesSearch(entry, query) {
+  if (!query) {
+    return true;
+  }
+
+  const searchable = [
+    entry.title,
+    entry.type === "payment" ? "payment" : "expense",
+    entry.paidBy,
+    entry.paidTo,
+    entry.date,
+    formatDate(entry.date),
+    formatMoney(entry.amount),
+    String(entry.amount),
+    hasReceipt(entry) ? "receipt archived attachment" : "",
+    entry.receipt?.name,
+    hasReminder(entry) ? "alarm reminder" : "",
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+
+  return searchable.includes(query);
 }
 
 function totals() {
@@ -364,19 +391,41 @@ function renderSummary() {
 
 function renderExpenses() {
   elements.expenseList.replaceChildren();
+  const query = elements.historySearch.value.trim().toLowerCase();
+  elements.clearSearch.classList.toggle("is-hidden", !query);
 
   if (!state.expenses.length) {
     const empty = document.createElement("div");
     empty.className = "empty-state";
     empty.innerHTML = `<i data-lucide="sparkles"></i><span>No expenses or payments yet. Add the first entry above.</span>`;
     elements.expenseList.append(empty);
+    if (window.lucide) {
+      window.lucide.createIcons();
+    }
     return;
   }
 
-  state.expenses
+  const visibleExpenses = state.expenses
     .slice()
     .sort((a, b) => b.createdAt - a.createdAt)
-    .forEach((expense) => {
+    .filter((expense) => expenseMatchesSearch(expense, query));
+
+  if (!visibleExpenses.length) {
+    const empty = document.createElement("div");
+    const icon = document.createElement("i");
+    const text = document.createElement("span");
+    empty.className = "empty-state";
+    icon.dataset.lucide = "search-x";
+    text.textContent = `No history matches "${elements.historySearch.value.trim()}".`;
+    empty.append(icon, text);
+    elements.expenseList.append(empty);
+    if (window.lucide) {
+      window.lucide.createIcons();
+    }
+    return;
+  }
+
+  visibleExpenses.forEach((expense) => {
       const item = elements.expenseTemplate.content.firstElementChild.cloneNode(true);
       item.dataset.id = expense.id;
       item.classList.toggle("is-editing", expense.id === editingExpenseId);
@@ -604,6 +653,12 @@ elements.expenseList.addEventListener("click", (event) => {
 
 elements.transactionType.addEventListener("change", renderTransactionMode);
 elements.reminderToggle.addEventListener("change", renderReminderMode);
+elements.historySearch.addEventListener("input", renderExpenses);
+elements.clearSearch.addEventListener("click", () => {
+  elements.historySearch.value = "";
+  renderExpenses();
+  elements.historySearch.focus();
+});
 elements.paidBy.addEventListener("change", () => {
   if (elements.transactionType.value === "payment") {
     updatePaymentRecipient();
@@ -673,8 +728,8 @@ function runTour(force = false) {
       {
         element: "#list-panel",
         popover: {
-          title: "Review and edit history",
-          description: "Use the history list to edit or delete recent expenses, payments, and receipt attachments.",
+          title: "Search and edit history",
+          description: "Search the history list, then edit or delete recent expenses, payments, and receipt attachments.",
         },
       },
       {

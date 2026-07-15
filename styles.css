@@ -396,6 +396,7 @@ body.is-dark :where(
   .invite-empty,
   .invite-item,
   .invite-phone,
+  .search-box,
   .reminder-pill,
   .receipt-archive,
   .expense-icon,
@@ -693,6 +694,48 @@ body.is-dark .mini-card.lavender {
 .expense-list {
   display: grid;
   gap: 12px;
+}
+
+.search-box {
+  position: relative;
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr) 38px;
+  align-items: center;
+  gap: 8px;
+  min-height: 50px;
+  margin-bottom: 14px;
+  padding: 0 8px 0 14px;
+  border: 1px solid rgba(39, 36, 49, 0.12);
+  border-radius: 8px;
+  color: #000;
+  background: rgba(255, 255, 255, 0.76);
+}
+
+body.is-dark .search-box {
+  border-color: rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.search-box input {
+  min-height: 44px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.search-box input:focus {
+  box-shadow: none;
+}
+
+.search-box:focus-within {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 4px rgba(46, 196, 182, 0.16);
+}
+
+.clear-search {
+  width: 36px;
+  min-height: 36px;
 }
 
 .expense-item {
