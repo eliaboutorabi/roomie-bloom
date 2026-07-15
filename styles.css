@@ -390,6 +390,12 @@ body.is-dark :where(
   .repo-link,
   .expense-item,
   .expense-item p,
+  .group-card,
+  .group-card h3,
+  .group-badge,
+  .invite-empty,
+  .invite-item,
+  .invite-phone,
   .reminder-pill,
   .receipt-archive,
   .expense-icon,
@@ -443,6 +449,115 @@ body.is-dark .balance-card p:last-child {
   margin: 0;
   color: #000;
   line-height: 1.5;
+}
+
+.group-card {
+  display: grid;
+  gap: 14px;
+  margin-top: 18px;
+  padding: 18px;
+  border: 1px solid rgba(39, 36, 49, 0.1);
+  border-radius: 8px;
+  color: #000;
+  background:
+    linear-gradient(145deg, rgba(255, 209, 102, 0.4), rgba(46, 196, 182, 0.18)),
+    rgba(255, 255, 255, 0.7);
+}
+
+body.is-dark .group-card {
+  border-color: rgba(255, 255, 255, 0.14);
+  background:
+    linear-gradient(145deg, rgba(255, 209, 102, 0.18), rgba(46, 196, 182, 0.14)),
+    rgba(255, 255, 255, 0.08);
+}
+
+.group-card-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.group-card h3 {
+  margin: 0;
+  color: #000;
+  font-size: 1.25rem;
+}
+
+.group-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 0 10px;
+  border-radius: 999px;
+  color: #000;
+  font-weight: 900;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+body.is-dark .group-badge {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.invite-list {
+  display: grid;
+  gap: 10px;
+}
+
+.invite-empty,
+.invite-item {
+  border: 1px solid rgba(39, 36, 49, 0.08);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.66);
+}
+
+body.is-dark .invite-empty,
+body.is-dark .invite-item {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.invite-empty {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  color: #000;
+  font-size: 0.84rem;
+  font-weight: 850;
+}
+
+.invite-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+}
+
+.invite-phone {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  gap: 8px;
+  color: #000;
+  font-weight: 850;
+}
+
+.invite-phone span {
+  overflow-wrap: anywhere;
+}
+
+.invite-actions {
+  display: inline-flex;
+  gap: 6px;
+}
+
+.invite-actions .icon-button {
+  width: 38px;
+  min-height: 38px;
+  color: #000;
+  text-decoration: none;
 }
 
 .summary-grid {
@@ -753,6 +868,18 @@ body.is-dark .mini-card.lavender {
 
   .expense-item {
     grid-template-columns: 42px minmax(0, 1fr) 44px 44px;
+  }
+
+  .invite-item {
+    grid-template-columns: 1fr;
+  }
+
+  .invite-actions {
+    width: 100%;
+  }
+
+  .invite-actions .icon-button {
+    flex: 1 1 0;
   }
 
   .expense-item strong {

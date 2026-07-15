@@ -40,6 +40,12 @@ const elements = {
   cancelEdit: document.querySelector("#cancel-edit"),
   themeToggle: document.querySelector("#theme-toggle"),
   restartTour: document.querySelector("#restart-tour"),
+  groupForm: document.querySelector("#group-form"),
+  groupName: document.querySelector("#group-name"),
+  invitePhone: document.querySelector("#invite-phone"),
+  groupNameDisplay: document.querySelector("#group-name-display"),
+  inviteCount: document.querySelector("#invite-count"),
+  inviteList: document.querySelector("#invite-list"),
 };
 
 function applyTheme(theme) {
@@ -60,6 +66,8 @@ function savedTheme() {
 function loadState() {
   const fallback = {
     people: ["Eli", "bahar"],
+    groupName: "Roomie group",
+    invites: [],
     expenses: [],
   };
 
@@ -68,6 +76,10 @@ function loadState() {
     if (!saved || !Array.isArray(saved.people) || !Array.isArray(saved.expenses)) {
       return fallback;
     }
+    saved.groupName = typeof saved.groupName === "string" && saved.groupName.trim() ? saved.groupName : fallback.groupName;
+    saved.invites = Array.isArray(saved.invites)
+      ? saved.invites.filter((invite) => invite && typeof invite.phone === "string")
+      : [];
     if (saved.people[0] === "Maya" && saved.people[1] === "Lily") {
       saved.people = fallback.people;
       saved.expenses = saved.expenses.map((entry) => ({
@@ -111,6 +123,31 @@ function formatDate(value) {
 
 function today() {
   return new Date().toISOString().slice(0, 10);
+}
+
+function normalizePhone(value) {
+  const trimmed = value.trim();
+  const digits = trimmed.replace(/\D/g, "");
+
+  if (!digits) {
+    return "";
+  }
+
+  return trimmed.startsWith("+") ? `+${digits}` : digits;
+}
+
+function formatPhone(value) {
+  const digits = value.replace(/\D/g, "");
+
+  if (digits.length === 10) {
+    return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+  }
+
+  if (digits.length === 11 && digits.startsWith("1")) {
+    return `+1 (${digits.slice(1, 4)}) ${digits.slice(4, 7)}-${digits.slice(7)}`;
+  }
+
+  return value;
 }
 
 function toLocalDateTimeValue(date = new Date()) {
@@ -219,6 +256,57 @@ function renderPeople() {
 
   elements.paidALabel.textContent = `${state.people[0]} paid`;
   elements.paidBLabel.textContent = `${state.people[1]} paid`;
+}
+
+function renderGroup() {
+  const groupName = state.groupName || "Roomie group";
+  elements.groupName.value = groupName;
+  elements.groupNameDisplay.textContent = groupName;
+  elements.inviteCount.textContent = String(state.invites.length);
+  elements.inviteList.replaceChildren();
+
+  if (!state.invites.length) {
+    const empty = document.createElement("div");
+    empty.className = "invite-empty";
+    empty.innerHTML = `<i data-lucide="message-circle-heart"></i><span>No invited friends yet.</span>`;
+    elements.inviteList.append(empty);
+    return;
+  }
+
+  state.invites.forEach((invite) => {
+    const item = document.createElement("article");
+    item.className = "invite-item";
+    item.dataset.id = invite.id;
+
+    const phone = document.createElement("div");
+    phone.className = "invite-phone";
+    phone.innerHTML = `<i data-lucide="smartphone"></i><span>${formatPhone(invite.phone)}</span>`;
+
+    const actions = document.createElement("div");
+    actions.className = "invite-actions";
+
+    const message = document.createElement("a");
+    message.className = "icon-button";
+    message.href = `sms:${invite.phone}?&body=${encodeURIComponent(`Join my ${groupName} group on Roomie Bloom!`)}`;
+    message.ariaLabel = `Text invite to ${formatPhone(invite.phone)}`;
+    message.innerHTML = `<i data-lucide="message-circle"></i>`;
+
+    const call = document.createElement("a");
+    call.className = "icon-button";
+    call.href = `tel:${invite.phone}`;
+    call.ariaLabel = `Call ${formatPhone(invite.phone)}`;
+    call.innerHTML = `<i data-lucide="phone"></i>`;
+
+    const remove = document.createElement("button");
+    remove.className = "icon-button delete-invite";
+    remove.type = "button";
+    remove.ariaLabel = `Remove ${formatPhone(invite.phone)}`;
+    remove.innerHTML = `<i data-lucide="x"></i>`;
+
+    actions.append(message, call, remove);
+    item.append(phone, actions);
+    elements.inviteList.append(item);
+  });
 }
 
 function formatReminderTime(value) {
@@ -342,6 +430,7 @@ function renderExpenses() {
 
 function render() {
   renderPeople();
+  renderGroup();
   renderSummary();
   renderExpenses();
   renderEditMode();
@@ -366,6 +455,36 @@ elements.roommatesForm.addEventListener("submit", (event) => {
     paidTo:
       expense.paidTo === oldPeople[0] ? first : expense.paidTo === oldPeople[1] ? second : expense.paidTo,
   }));
+  render();
+});
+
+elements.groupForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const groupName = elements.groupName.value.trim() || "Roomie group";
+  const phone = normalizePhone(elements.invitePhone.value);
+
+  state.groupName = groupName;
+
+  if (phone && !state.invites.some((invite) => invite.phone === phone)) {
+    state.invites.push({
+      id: crypto.randomUUID(),
+      phone,
+      createdAt: Date.now(),
+    });
+  }
+
+  elements.invitePhone.value = "";
+  render();
+});
+
+elements.inviteList.addEventListener("click", (event) => {
+  const button = event.target.closest(".delete-invite");
+  if (!button) {
+    return;
+  }
+
+  const item = button.closest(".invite-item");
+  state.invites = state.invites.filter((invite) => invite.id !== item.dataset.id);
   render();
 });
 
@@ -527,7 +646,14 @@ function runTour(force = false) {
         element: "#roommates-panel",
         popover: {
           title: "Start with both names",
-          description: "Add the two roommates so the app can split every shared cost evenly.",
+          description: "Add the roommates, name the group, and invite a friend by phone number.",
+        },
+      },
+      {
+        element: "#group-card",
+        popover: {
+          title: "Create the group",
+          description: "Save a group name and keep phone invites here with quick text and call buttons.",
         },
       },
       {
