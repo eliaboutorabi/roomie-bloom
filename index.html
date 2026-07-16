@@ -13,11 +13,40 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/driver.js@1.3.6/dist/driver.css"
     />
-    <link rel="stylesheet" href="./styles.css?v=clean-ui" />
+    <link rel="stylesheet" href="./styles.css?v=left-sidebar" />
   </head>
   <body>
     <main class="app-shell">
-      <section class="hero" aria-labelledby="app-title">
+      <aside class="app-sidebar" aria-label="App navigation">
+        <a class="sidebar-brand" href="#app-title">
+          <span class="brand-mark">R</span>
+          <span>
+            <strong>Roomie Bloom</strong>
+            <small>Shared expenses</small>
+          </span>
+        </a>
+        <nav class="sidebar-nav">
+          <a href="#roommates-panel">
+            <i data-lucide="users-round"></i>
+            Roommates
+          </a>
+          <a href="#expense-panel">
+            <i data-lucide="badge-plus"></i>
+            Add
+          </a>
+          <a href="#summary-panel">
+            <i data-lucide="chart-no-axes-column"></i>
+            Summary
+          </a>
+          <a href="#list-panel">
+            <i data-lucide="history"></i>
+            History
+          </a>
+        </nav>
+      </aside>
+
+      <div class="app-content">
+        <section class="hero" aria-labelledby="app-title">
         <button class="icon-button theme-toggle" type="button" id="theme-toggle" aria-label="Toggle color theme">
           <i data-lucide="moon"></i>
         </button>
@@ -33,9 +62,9 @@
             <img src="./assets/electricity-bill-photo.jpg" alt="" loading="eager" />
           </figure>
         </div>
-      </section>
+        </section>
 
-      <section class="workspace" aria-label="Expense tracker">
+        <section class="workspace" aria-label="Expense tracker">
         <aside class="panel setup-panel" id="roommates-panel">
           <div class="panel-heading">
             <div>
@@ -224,9 +253,9 @@
           </label>
           <div class="expense-list" id="expense-list" aria-live="polite"></div>
         </section>
-      </section>
+        </section>
 
-      <footer class="app-footer">
+        <footer class="app-footer">
         <p>Built by <strong>Elham Aboutorabi</strong></p>
         <a
           class="repo-link"
@@ -242,7 +271,8 @@
           </svg>
           View on GitHub
         </a>
-      </footer>
+        </footer>
+      </div>
     </main>
 
     <template id="expense-template">
