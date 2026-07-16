@@ -42,6 +42,7 @@ const elements = {
   cancelEdit: document.querySelector("#cancel-edit"),
   themeToggle: document.querySelector("#theme-toggle"),
   restartTour: document.querySelector("#restart-tour"),
+  sidebarNav: document.querySelector(".sidebar-nav"),
   groupForm: document.querySelector("#group-form"),
   groupName: document.querySelector("#group-name"),
   invitePhone: document.querySelector("#invite-phone"),
@@ -658,6 +659,21 @@ elements.clearSearch.addEventListener("click", () => {
   elements.historySearch.value = "";
   renderExpenses();
   elements.historySearch.focus();
+});
+elements.sidebarNav.addEventListener("click", (event) => {
+  const link = event.target.closest("a[href^='#']");
+  if (!link) {
+    return;
+  }
+
+  const target = document.querySelector(link.getAttribute("href"));
+  if (!target) {
+    return;
+  }
+
+  event.preventDefault();
+  target.scrollIntoView({ behavior: "auto", block: "start" });
+  history.replaceState(null, "", link.getAttribute("href"));
 });
 elements.paidBy.addEventListener("change", () => {
   if (elements.transactionType.value === "payment") {

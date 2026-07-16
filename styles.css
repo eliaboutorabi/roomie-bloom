@@ -129,6 +129,10 @@ body.is-dark .sidebar-nav a {
   gap: 6px;
 }
 
+.sidebar-nav svg {
+  pointer-events: none;
+}
+
 .sidebar-nav a {
   display: flex;
   align-items: center;
