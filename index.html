@@ -13,7 +13,7 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/driver.js@1.3.6/dist/driver.css"
     />
-    <link rel="stylesheet" href="./styles.css?v=history-search" />
+    <link rel="stylesheet" href="./styles.css?v=clean-ui" />
   </head>
   <body>
     <main class="app-shell">
@@ -65,8 +65,8 @@
             </button>
           </form>
 
-          <div class="group-card" id="group-card">
-            <div class="group-card-heading">
+          <details class="group-card" id="group-card">
+            <summary class="group-card-heading">
               <div>
                 <p class="section-kicker">
                   <i data-lucide="user-plus"></i>
@@ -78,7 +78,7 @@
                 <i data-lucide="users-round"></i>
                 <span id="invite-count">0</span>
               </div>
-            </div>
+            </summary>
 
             <form id="group-form" class="stacked-form">
               <label>
@@ -96,7 +96,7 @@
             </form>
 
             <div class="invite-list" id="invite-list" aria-live="polite"></div>
-          </div>
+          </details>
 
           <div class="balance-card" id="balance-card">
             <p class="section-kicker">
