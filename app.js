@@ -42,7 +42,9 @@ const elements = {
   cancelEdit: document.querySelector("#cancel-edit"),
   themeToggle: document.querySelector("#theme-toggle"),
   restartTour: document.querySelector("#restart-tour"),
-  sidebarNav: document.querySelector(".sidebar-nav"),
+  sidebar: document.querySelector(".app-sidebar"),
+  sidebarLinks: document.querySelectorAll(".sidebar-nav [data-view]"),
+  viewPanels: document.querySelectorAll("[data-view-panel]"),
   groupForm: document.querySelector("#group-form"),
   groupName: document.querySelector("#group-name"),
   invitePhone: document.querySelector("#invite-phone"),
@@ -168,6 +170,37 @@ function hasReminder(entry) {
 
 function hasReceipt(entry) {
   return Boolean(entry.receipt && entry.receipt.dataUrl);
+}
+
+function setActiveView(view, updateHash = true) {
+  const nextView = [...elements.viewPanels].some((panel) => panel.dataset.viewPanel === view) ? view : "add";
+
+  elements.viewPanels.forEach((panel) => {
+    panel.classList.toggle("is-active", panel.dataset.viewPanel === nextView);
+  });
+
+  elements.sidebarLinks.forEach((link) => {
+    const isCurrent = link.dataset.view === nextView;
+    if (isCurrent) {
+      link.setAttribute("aria-current", "page");
+    } else {
+      link.removeAttribute("aria-current");
+    }
+  });
+
+  if (updateHash) {
+    const activeLink = [...elements.sidebarLinks].find((link) => link.dataset.view === nextView);
+    if (activeLink) {
+      history.replaceState(null, "", activeLink.getAttribute("href"));
+    }
+  }
+
+  window.scrollTo({ top: 0, behavior: "auto" });
+}
+
+function viewFromHash(hash) {
+  const link = [...elements.sidebarLinks].find((item) => item.getAttribute("href") === hash);
+  return link?.dataset.view || "add";
 }
 
 function expenseMatchesSearch(entry, query) {
@@ -549,6 +582,7 @@ function resetExpenseForm() {
 }
 
 function startEditingExpense(expense) {
+  setActiveView("add");
   editingExpenseId = expense.id;
   elements.transactionType.value = expense.type || "expense";
   elements.expenseTitle.value = expense.title || "";
@@ -660,20 +694,14 @@ elements.clearSearch.addEventListener("click", () => {
   renderExpenses();
   elements.historySearch.focus();
 });
-elements.sidebarNav.addEventListener("click", (event) => {
-  const link = event.target.closest("a[href^='#']");
+elements.sidebar.addEventListener("click", (event) => {
+  const link = event.target.closest("[data-view]");
   if (!link) {
     return;
   }
 
-  const target = document.querySelector(link.getAttribute("href"));
-  if (!target) {
-    return;
-  }
-
   event.preventDefault();
-  target.scrollIntoView({ behavior: "auto", block: "start" });
-  history.replaceState(null, "", link.getAttribute("href"));
+  setActiveView(link.dataset.view);
 });
 elements.paidBy.addEventListener("change", () => {
   if (elements.transactionType.value === "payment") {
@@ -761,18 +789,18 @@ function runTour(force = false) {
   driver.drive();
 }
 
-elements.restartTour.addEventListener("click", () => runTour(true));
+elements.restartTour.addEventListener("click", () => {
+  setActiveView("roommates");
+  runTour(true);
+});
 
 elements.expenseDate.value = today();
 elements.reminderAt.min = toLocalDateTimeValue();
 applyTheme(savedTheme());
+setActiveView(viewFromHash(window.location.hash), Boolean(window.location.hash));
 renderTransactionMode();
 renderReminderMode();
 render();
-
-window.addEventListener("load", () => {
-  window.setTimeout(() => runTour(false), 450);
-});
 
 window.setInterval(checkReminders, REMINDER_CHECK_INTERVAL);
 

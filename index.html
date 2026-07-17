@@ -13,32 +13,37 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/driver.js@1.3.6/dist/driver.css"
     />
-    <link rel="stylesheet" href="./styles.css?v=compact-sidebar" />
+    <link rel="stylesheet" href="./styles.css?v=sidebar-views" />
   </head>
   <body>
     <main class="app-shell">
       <aside class="app-sidebar" aria-label="App navigation">
-        <a class="sidebar-brand" href="#app-title">
-          <span class="brand-mark">R</span>
-          <span>
-            <strong>Roomie Bloom</strong>
-            <small>Shared expenses</small>
-          </span>
-        </a>
+        <div class="sidebar-top">
+          <a class="sidebar-brand" href="#expense-panel" data-view="add">
+            <span class="brand-mark">R</span>
+            <span>
+              <strong>Roomie Bloom</strong>
+              <small>Shared expenses</small>
+            </span>
+          </a>
+          <button class="icon-button theme-toggle" type="button" id="theme-toggle" aria-label="Toggle color theme">
+            <i data-lucide="moon"></i>
+          </button>
+        </div>
         <nav class="sidebar-nav">
-          <a href="#roommates-panel">
+          <a href="#roommates-panel" data-view="roommates">
             <i data-lucide="users-round"></i>
             Roommates
           </a>
-          <a href="#expense-panel">
+          <a href="#expense-panel" data-view="add" aria-current="page">
             <i data-lucide="badge-plus"></i>
             Add
           </a>
-          <a href="#summary-panel">
+          <a href="#summary-panel" data-view="summary">
             <i data-lucide="chart-no-axes-column"></i>
             Summary
           </a>
-          <a href="#list-panel">
+          <a href="#list-panel" data-view="history">
             <i data-lucide="history"></i>
             History
           </a>
@@ -46,10 +51,7 @@
       </aside>
 
       <div class="app-content">
-        <section class="hero" aria-labelledby="app-title">
-        <button class="icon-button theme-toggle" type="button" id="theme-toggle" aria-label="Toggle color theme">
-          <i data-lucide="moon"></i>
-        </button>
+        <section class="hero is-hidden" aria-labelledby="app-title">
         <div class="hero-copy">
           <p class="eyebrow">Shared life, simpler money</p>
           <h1 id="app-title">Roomie Bloom</h1>
@@ -65,7 +67,7 @@
         </section>
 
         <section class="workspace" aria-label="Expense tracker">
-        <aside class="panel setup-panel" id="roommates-panel">
+        <aside class="panel setup-panel view-section" id="roommates-panel" data-view-panel="roommates">
           <div class="panel-heading">
             <div>
               <p class="section-kicker">
@@ -137,7 +139,7 @@
           </div>
         </aside>
 
-        <section class="panel expense-panel" id="expense-panel">
+        <section class="panel expense-panel view-section is-active" id="expense-panel" data-view-panel="add">
           <div class="panel-heading">
             <div>
               <p class="section-kicker">
@@ -207,7 +209,7 @@
           </form>
         </section>
 
-        <section class="summary-grid" id="summary-panel" aria-label="Summary">
+        <section class="summary-grid view-section" id="summary-panel" data-view-panel="summary" aria-label="Summary">
           <article class="mini-card coral">
             <div class="mini-icon"><i data-lucide="receipt-text"></i></div>
             <p>Total shared</p>
@@ -230,7 +232,7 @@
           </article>
         </section>
 
-        <section class="panel list-panel" id="list-panel">
+        <section class="panel list-panel view-section" id="list-panel" data-view-panel="history">
           <div class="panel-heading">
             <div>
               <p class="section-kicker">
@@ -296,6 +298,6 @@
 
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/driver.js@1.3.6/dist/driver.js.iife.js"></script>
-    <script src="./app.js?v=sidebar-nav-fix"></script>
+    <script src="./app.js?v=sidebar-views"></script>
   </body>
 </html>

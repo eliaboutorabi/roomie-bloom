@@ -91,10 +91,18 @@ body.is-dark .sidebar-nav a {
   color: #fff;
 }
 
+.sidebar-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
 .sidebar-brand {
   display: flex;
   align-items: center;
   gap: 10px;
+  min-width: 0;
 }
 
 .brand-mark {
@@ -146,14 +154,16 @@ body.is-dark .sidebar-nav a {
 }
 
 .sidebar-nav a:hover,
-.sidebar-nav a:focus-visible {
+.sidebar-nav a:focus-visible,
+.sidebar-nav a[aria-current="page"] {
   color: #000;
   background: rgba(255, 209, 102, 0.22);
   outline: none;
 }
 
 body.is-dark .sidebar-nav a:hover,
-body.is-dark .sidebar-nav a:focus-visible {
+body.is-dark .sidebar-nav a:focus-visible,
+body.is-dark .sidebar-nav a[aria-current="page"] {
   color: #fff;
   background: rgba(255, 255, 255, 0.08);
 }
@@ -175,13 +185,6 @@ body.is-dark .sidebar-nav a:focus-visible {
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.82);
   box-shadow: var(--shadow);
-}
-
-.theme-toggle {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  z-index: 2;
 }
 
 .eyebrow,
@@ -261,10 +264,28 @@ body.is-dark .bill-photo-card {
 }
 
 .workspace {
-  display: grid;
-  grid-template-columns: 0.82fr 1.18fr;
-  gap: 14px;
+  display: block;
   margin-top: 14px;
+}
+
+.view-section:not(.is-active) {
+  display: none;
+}
+
+.view-section.is-active {
+  animation: view-in 140ms ease-out;
+}
+
+@keyframes view-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .panel,
@@ -281,7 +302,23 @@ body.is-dark .bill-photo-card {
 }
 
 .setup-panel {
-  grid-row: span 3;
+  max-width: 680px;
+}
+
+.expense-panel {
+  max-width: 760px;
+}
+
+.list-panel,
+.summary-grid.is-active {
+  max-width: 820px;
+}
+
+.expense-panel,
+.list-panel,
+.summary-grid.is-active,
+.setup-panel.is-active {
+  margin: 0 auto;
 }
 
 .panel-heading {
