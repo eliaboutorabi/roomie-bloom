@@ -67,8 +67,8 @@ button {
   top: 18px;
   align-self: start;
   display: grid;
-  gap: 18px;
-  min-height: calc(100vh - 36px);
+  gap: 14px;
+  min-height: 0;
   padding: 16px;
   border: 1px solid var(--line);
   border-radius: 18px;
@@ -126,7 +126,7 @@ body.is-dark .sidebar-nav a {
 
 .sidebar-nav {
   display: grid;
-  gap: 6px;
+  gap: 3px;
 }
 
 .sidebar-nav svg {
@@ -137,7 +137,7 @@ body.is-dark .sidebar-nav a {
   display: flex;
   align-items: center;
   gap: 9px;
-  min-height: 42px;
+  min-height: 36px;
   padding: 0 10px;
   border-radius: 8px;
   color: var(--muted);
