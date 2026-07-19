@@ -523,12 +523,6 @@ body.is-dark :where(
   .repo-link,
   .expense-item,
   .expense-item p,
-  .group-card,
-  .group-card h3,
-  .group-badge,
-  .invite-empty,
-  .invite-item,
-  .invite-phone,
   .search-box,
   .reminder-pill,
   .receipt-archive,
@@ -579,125 +573,6 @@ body.is-dark .balance-card p:last-child {
   margin: 0;
   color: #000;
   line-height: 1.5;
-}
-
-.group-card {
-  display: grid;
-  gap: 0;
-  margin-top: 14px;
-  padding: 14px;
-  border: 1px solid rgba(32, 28, 22, 0.09);
-  border-radius: 8px;
-  color: #000;
-  background: rgba(255, 255, 255, 0.58);
-}
-
-body.is-dark .group-card {
-  border-color: rgba(255, 255, 255, 0.14);
-  background: rgba(255, 255, 255, 0.06);
-}
-
-.group-card-heading {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-  cursor: pointer;
-  list-style: none;
-}
-
-.group-card-heading::-webkit-details-marker {
-  display: none;
-}
-
-.group-card[open] {
-  gap: 12px;
-}
-
-.group-card[open] .group-card-heading {
-  padding-bottom: 2px;
-}
-
-.group-card h3 {
-  margin: 0;
-  color: #000;
-  font-size: 1.08rem;
-}
-
-.group-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  min-height: 30px;
-  padding: 0 10px;
-  border-radius: 999px;
-  color: #000;
-  font-weight: 760;
-  background: rgba(255, 209, 102, 0.22);
-}
-
-body.is-dark .group-badge {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.invite-list {
-  display: grid;
-  gap: 8px;
-}
-
-.invite-empty,
-.invite-item {
-  border: 1px solid rgba(39, 36, 49, 0.08);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.52);
-}
-
-body.is-dark .invite-empty,
-body.is-dark .invite-item {
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.invite-empty {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px;
-  color: #000;
-  font-size: 0.82rem;
-  font-weight: 680;
-}
-
-.invite-item {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 10px;
-  padding: 8px;
-}
-
-.invite-phone {
-  display: inline-flex;
-  align-items: center;
-  min-width: 0;
-  gap: 8px;
-  color: #000;
-  font-weight: 700;
-}
-
-.invite-phone span {
-  overflow-wrap: anywhere;
-}
-
-.invite-actions {
-  display: inline-flex;
-  gap: 6px;
-}
-
-.invite-actions .icon-button {
-  width: 36px;
-  min-height: 36px;
-  color: #000;
-  text-decoration: none;
 }
 
 .summary-grid {
@@ -1126,18 +1001,6 @@ body.is-dark .search-box {
 
   .expense-item {
     grid-template-columns: 38px minmax(0, 1fr) 40px 40px;
-  }
-
-  .invite-item {
-    grid-template-columns: 1fr;
-  }
-
-  .invite-actions {
-    width: 100%;
-  }
-
-  .invite-actions .icon-button {
-    flex: 1 1 0;
   }
 
   .expense-item strong {
