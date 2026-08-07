@@ -691,6 +691,7 @@ body.is-dark .mini-card.lavender {
 .app-footer p {
   margin: 0;
   color: var(--muted);
+  font-size: 1.02rem;
   font-weight: 680;
 }
 
@@ -708,6 +709,7 @@ body.is-dark .mini-card.lavender {
   border: 1px solid rgba(39, 36, 49, 0.12);
   border-radius: 8px;
   color: #000;
+  font-size: 1rem;
   font-weight: 760;
   text-decoration: none;
   background: rgba(255, 209, 102, 0.18);
