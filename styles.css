@@ -690,13 +690,13 @@ body.is-dark .mini-card.lavender {
 
 .app-footer p {
   margin: 0;
-  color: var(--muted);
+  color: #d62828;
   font-size: 0.88rem;
   font-weight: 620;
 }
 
 .app-footer strong {
-  color: var(--ink);
+  color: #d62828;
 }
 
 .repo-link {
