@@ -11,8 +11,8 @@ let editingExpenseId = null;
 
 const elements = {
   roommatesForm: document.querySelector("#roommates-form"),
-  personA: document.querySelector("#person-a"),
-  personB: document.querySelector("#person-b"),
+  roommateFields: document.querySelector("#roommate-fields"),
+  addRoommate: document.querySelector("#add-roommate"),
   transactionType: document.querySelector("#transaction-type"),
   paidBy: document.querySelector("#expense-paid-by"),
   paidTo: document.querySelector("#expense-paid-to"),
@@ -28,10 +28,7 @@ const elements = {
   reminderAt: document.querySelector("#reminder-at"),
   totalShared: document.querySelector("#total-shared"),
   totalPayments: document.querySelector("#total-payments"),
-  paidA: document.querySelector("#paid-a"),
-  paidB: document.querySelector("#paid-b"),
-  paidALabel: document.querySelector("#paid-a-label"),
-  paidBLabel: document.querySelector("#paid-b-label"),
+  roommatePaidCards: document.querySelector("#roommate-paid-cards"),
   balanceTitle: document.querySelector("#balance-title"),
   balanceDetail: document.querySelector("#balance-detail"),
   expenseList: document.querySelector("#expense-list"),
@@ -73,6 +70,7 @@ function loadState() {
     if (!saved || !Array.isArray(saved.people) || !Array.isArray(saved.expenses)) {
       return fallback;
     }
+    saved.people = normalizePeople(saved.people, fallback.people);
     if (saved.people[0] === "Maya" && saved.people[1] === "Lily") {
       saved.people = fallback.people;
       saved.expenses = saved.expenses.map((entry) => ({
@@ -97,6 +95,11 @@ function loadState() {
 
 function saveState() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function normalizePeople(people, fallback = ["Eli", "bahar"]) {
+  const cleaned = people.map((person) => String(person || "").trim()).filter(Boolean);
+  return cleaned.length >= 2 ? cleaned : fallback;
 }
 
 function formatMoney(value) {
@@ -193,18 +196,18 @@ function expenseMatchesSearch(entry, query) {
 
 function totals() {
   const paid = Object.fromEntries(state.people.map((person) => [person, 0]));
+  const paymentDelta = Object.fromEntries(state.people.map((person) => [person, 0]));
   let total = 0;
   let payments = 0;
-  let firstPaymentDelta = 0;
 
   state.expenses.forEach((entry) => {
     if (isPayment(entry)) {
       payments += entry.amount;
-      if (entry.paidBy === state.people[0]) {
-        firstPaymentDelta += entry.amount;
+      if (entry.paidBy in paymentDelta) {
+        paymentDelta[entry.paidBy] += entry.amount;
       }
-      if (entry.paidTo === state.people[0]) {
-        firstPaymentDelta -= entry.amount;
+      if (entry.paidTo in paymentDelta) {
+        paymentDelta[entry.paidTo] -= entry.amount;
       }
       return;
     }
@@ -213,9 +216,11 @@ function totals() {
     total += entry.amount;
   });
 
-  const expectedShare = total / 2;
-  const firstDelta = paid[state.people[0]] - expectedShare + firstPaymentDelta;
-  return { total, paid, payments, expectedShare, firstDelta };
+  const expectedShare = total / state.people.length;
+  const balances = Object.fromEntries(
+    state.people.map((person) => [person, (paid[person] || 0) - expectedShare + (paymentDelta[person] || 0)]),
+  );
+  return { total, paid, payments, expectedShare, balances };
 }
 
 function fillPersonSelect(select, people) {
@@ -237,6 +242,41 @@ function fillPersonSelect(select, people) {
 function updatePaymentRecipient() {
   const recipient = state.people.find((person) => person !== elements.paidBy.value) || state.people[1];
   elements.paidTo.value = recipient;
+}
+
+function fillPaymentRecipientSelect() {
+  const recipients = state.people.filter((person) => person !== elements.paidBy.value);
+  fillPersonSelect(elements.paidTo, recipients.length ? recipients : state.people);
+}
+
+function createRoommateField(name = "", index = 0) {
+  const row = document.createElement("div");
+  row.className = "roommate-row";
+
+  const label = document.createElement("label");
+  label.append(`Roommate ${index + 1}`);
+
+  const input = document.createElement("input");
+  input.className = "roommate-name";
+  input.type = "text";
+  input.autocomplete = "given-name";
+  input.required = index < 2;
+  input.value = name;
+  input.placeholder = `Roommate ${index + 1}`;
+
+  label.append(input);
+  row.append(label);
+
+  if (index >= 2) {
+    const remove = document.createElement("button");
+    remove.className = "icon-button remove-roommate";
+    remove.type = "button";
+    remove.ariaLabel = `Remove roommate ${index + 1}`;
+    remove.innerHTML = `<i data-lucide="x"></i>`;
+    row.append(remove);
+  }
+
+  return row;
 }
 
 function renderTransactionMode() {
@@ -272,14 +312,14 @@ function renderEditMode() {
 }
 
 function renderPeople() {
-  elements.personA.value = state.people[0];
-  elements.personB.value = state.people[1];
+  elements.roommateFields.replaceChildren(
+    ...state.people.map((person, index) => createRoommateField(person, index)),
+  );
   fillPersonSelect(elements.paidBy, state.people);
-  fillPersonSelect(elements.paidTo, state.people);
-  updatePaymentRecipient();
-
-  elements.paidALabel.textContent = `${state.people[0]} paid`;
-  elements.paidBLabel.textContent = `${state.people[1]} paid`;
+  fillPaymentRecipientSelect();
+  if (elements.transactionType.value === "payment" && (!elements.paidTo.value || elements.paidTo.value === elements.paidBy.value)) {
+    updatePaymentRecipient();
+  }
 }
 
 function formatReminderTime(value) {
@@ -316,23 +356,85 @@ function readReceiptAttachment(file) {
 }
 
 function renderSummary() {
-  const { total, paid, payments, firstDelta } = totals();
+  const { total, paid, payments, balances } = totals();
   elements.totalShared.textContent = formatMoney(total);
   elements.totalPayments.textContent = formatMoney(payments);
-  elements.paidA.textContent = formatMoney(paid[state.people[0]] || 0);
-  elements.paidB.textContent = formatMoney(paid[state.people[1]] || 0);
+  elements.roommatePaidCards.replaceChildren(
+    ...state.people.map((person, index) => {
+      const card = document.createElement("article");
+      const palette = ["teal", "yellow", "coral", "lavender"][index % 4];
+      const icon = document.createElement("div");
+      const iconGlyph = document.createElement("i");
+      const label = document.createElement("p");
+      const amount = document.createElement("strong");
+      card.className = `mini-card ${palette}`;
+      icon.className = "mini-icon";
+      iconGlyph.dataset.lucide = index % 2 === 0 ? "credit-card" : "wallet";
+      label.textContent = `${person} paid`;
+      amount.textContent = formatMoney(paid[person] || 0);
+      icon.append(iconGlyph);
+      card.append(icon, label, amount);
+      return card;
+    }),
+  );
 
-  const roundedDelta = Math.round(firstDelta * 100) / 100;
-  if (Math.abs(roundedDelta) < 0.01) {
+  const settlements = settlementSuggestions(balances);
+  if (!settlements.length) {
     elements.balanceTitle.textContent = "All even";
     elements.balanceDetail.textContent = "No one owes anything right now.";
     return;
   }
 
-  const owedBy = roundedDelta > 0 ? state.people[1] : state.people[0];
-  const owedTo = roundedDelta > 0 ? state.people[0] : state.people[1];
-  elements.balanceTitle.textContent = `${owedBy} owes ${owedTo}`;
-  elements.balanceDetail.textContent = `${formatMoney(Math.abs(roundedDelta))} settles everything.`;
+  elements.balanceTitle.textContent = "Settle up";
+  elements.balanceDetail.replaceChildren(
+    ...settlements.map((settlement) => {
+      const line = document.createElement("span");
+      line.textContent = `${settlement.from} pays ${settlement.to} ${formatMoney(settlement.amount)}`;
+      return line;
+    }),
+  );
+}
+
+function settlementSuggestions(balances) {
+  const debtors = [];
+  const creditors = [];
+
+  Object.entries(balances).forEach(([person, balance]) => {
+    const amount = Math.round(balance * 100) / 100;
+    if (amount < -0.01) {
+      debtors.push({ person, amount: Math.abs(amount) });
+    } else if (amount > 0.01) {
+      creditors.push({ person, amount });
+    }
+  });
+
+  const settlements = [];
+  let debtorIndex = 0;
+  let creditorIndex = 0;
+
+  while (debtorIndex < debtors.length && creditorIndex < creditors.length) {
+    const debtor = debtors[debtorIndex];
+    const creditor = creditors[creditorIndex];
+    const amount = Math.min(debtor.amount, creditor.amount);
+
+    settlements.push({
+      from: debtor.person,
+      to: creditor.person,
+      amount,
+    });
+
+    debtor.amount = Math.round((debtor.amount - amount) * 100) / 100;
+    creditor.amount = Math.round((creditor.amount - amount) * 100) / 100;
+
+    if (debtor.amount < 0.01) {
+      debtorIndex += 1;
+    }
+    if (creditor.amount < 0.01) {
+      creditorIndex += 1;
+    }
+  }
+
+  return settlements;
 }
 
 function renderExpenses() {
@@ -438,18 +540,49 @@ function render() {
 
 elements.roommatesForm.addEventListener("submit", (event) => {
   event.preventDefault();
-  const first = elements.personA.value.trim() || "Roommate 1";
-  const second = elements.personB.value.trim() || "Roommate 2";
+  const nextPeople = normalizePeople(
+    [...elements.roommateFields.querySelectorAll(".roommate-name")].map((input, index) =>
+      input.value.trim() || `Roommate ${index + 1}`,
+    ),
+  );
   const oldPeople = [...state.people];
-  state.people = [first, second];
+  const renamedPeople = Object.fromEntries(oldPeople.map((person, index) => [person, nextPeople[index]]));
+  state.people = nextPeople;
   state.expenses = state.expenses.map((expense) => ({
     ...expense,
-    paidBy:
-      expense.paidBy === oldPeople[0] ? first : expense.paidBy === oldPeople[1] ? second : expense.paidBy,
+    paidBy: renamedPeople[expense.paidBy] || (nextPeople.includes(expense.paidBy) ? expense.paidBy : nextPeople[0]),
     paidTo:
-      expense.paidTo === oldPeople[0] ? first : expense.paidTo === oldPeople[1] ? second : expense.paidTo,
+      renamedPeople[expense.paidTo] ||
+      (nextPeople.includes(expense.paidTo)
+        ? expense.paidTo
+        : nextPeople.find((person) => person !== (renamedPeople[expense.paidBy] || expense.paidBy)) || nextPeople[1]),
   }));
   render();
+});
+
+elements.addRoommate.addEventListener("click", () => {
+  const index = elements.roommateFields.querySelectorAll(".roommate-name").length;
+  elements.roommateFields.append(createRoommateField("", index));
+  if (window.lucide) {
+    window.lucide.createIcons();
+  }
+  elements.roommateFields.querySelector(".roommate-row:last-child input").focus();
+});
+
+elements.roommateFields.addEventListener("click", (event) => {
+  const button = event.target.closest(".remove-roommate");
+  if (!button) {
+    return;
+  }
+
+  button.closest(".roommate-row").remove();
+  [...elements.roommateFields.querySelectorAll(".roommate-row")].forEach((row, index) => {
+    const label = row.querySelector("label");
+    const input = row.querySelector("input");
+    label.firstChild.textContent = `Roommate ${index + 1}`;
+    input.placeholder = `Roommate ${index + 1}`;
+    input.required = index < 2;
+  });
 });
 
 function resetExpenseForm() {
@@ -586,7 +719,7 @@ elements.sidebar.addEventListener("click", (event) => {
 });
 elements.paidBy.addEventListener("change", () => {
   if (elements.transactionType.value === "payment") {
-    updatePaymentRecipient();
+    fillPaymentRecipientSelect();
   }
 });
 
@@ -626,7 +759,7 @@ function runTour(force = false) {
         element: "#roommates-panel",
         popover: {
           title: "Start with both names",
-          description: "Add both roommates so the app can split expenses and payments correctly.",
+          description: "Add everyone who shares the home so the app can split expenses and payments correctly.",
         },
       },
       {
@@ -654,7 +787,7 @@ function runTour(force = false) {
         element: "#balance-card",
         popover: {
           title: "Settle up fast",
-          description: "This tells you who owes whom so both people end up paying half.",
+          description: "This tells you who owes whom so every roommate ends up paying their fair share.",
         },
       },
     ],

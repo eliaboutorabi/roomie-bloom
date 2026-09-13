@@ -305,6 +305,27 @@ body.is-dark .bill-photo-card {
   max-width: 680px;
 }
 
+.roommate-fields {
+  display: grid;
+  gap: 10px;
+}
+
+.roommate-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 42px;
+  align-items: end;
+  gap: 8px;
+}
+
+.roommate-row:first-child,
+.roommate-row:nth-child(2) {
+  grid-template-columns: 1fr;
+}
+
+.add-roommate-button {
+  width: 100%;
+}
+
 .expense-panel {
   max-width: 760px;
 }
@@ -570,6 +591,8 @@ body.is-dark .balance-card p:last-child {
 }
 
 .balance-card p:last-child {
+  display: grid;
+  gap: 4px;
   margin: 0;
   color: #000;
   line-height: 1.5;
@@ -579,6 +602,10 @@ body.is-dark .balance-card p:last-child {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
+}
+
+.roommate-paid-cards {
+  display: contents;
 }
 
 .mini-card {
