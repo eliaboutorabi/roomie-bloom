@@ -48,7 +48,9 @@ function applyTheme(theme) {
   const isDark = theme === "dark";
   document.body.classList.toggle("is-dark", isDark);
   elements.themeToggle.setAttribute("aria-pressed", String(isDark));
-  elements.themeToggle.querySelector("i").dataset.lucide = isDark ? "sun" : "moon";
+  const icon = document.createElement("i");
+  icon.dataset.lucide = isDark ? "sun" : "moon";
+  elements.themeToggle.replaceChildren(icon);
 
   if (window.lucide) {
     window.lucide.createIcons();
