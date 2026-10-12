@@ -57,6 +57,8 @@ button {
   display: grid;
   grid-template-columns: 200px minmax(0, 1fr);
   gap: 16px;
+  min-height: 100vh;
+  min-height: 100dvh;
   width: min(1180px, calc(100% - 32px));
   margin: 0 auto;
   padding: 18px 0 38px;
@@ -169,6 +171,8 @@ body.is-dark .sidebar-nav a[aria-current="page"] {
 }
 
 .app-content {
+  display: flex;
+  flex-direction: column;
   min-width: 0;
 }
 
@@ -265,6 +269,7 @@ body.is-dark .bill-photo-card {
 
 .workspace {
   display: block;
+  flex: 1;
   margin-top: 14px;
 }
 
@@ -965,6 +970,7 @@ body.is-dark .search-box {
 
   .app-shell {
     grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
     gap: 8px;
     width: min(100% - 20px, 680px);
     padding: calc(8px + env(safe-area-inset-top)) env(safe-area-inset-right) calc(24px + env(safe-area-inset-bottom)) env(safe-area-inset-left);
