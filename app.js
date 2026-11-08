@@ -38,6 +38,8 @@ const elements = {
   clearAll: document.querySelector("#clear-all"),
   cancelEdit: document.querySelector("#cancel-edit"),
   themeToggle: document.querySelector("#theme-toggle"),
+  creatorCredit: document.querySelector("#creator-credit"),
+  creatorCreditText: document.querySelector("#creator-credit-text"),
   restartTour: document.querySelector("#restart-tour"),
   sidebar: document.querySelector(".app-sidebar"),
   sidebarLinks: document.querySelectorAll(".sidebar-nav [data-view]"),
@@ -737,6 +739,24 @@ elements.clearAll.addEventListener("click", () => {
 elements.cancelEdit.addEventListener("click", () => {
   resetExpenseForm();
   render();
+});
+
+function setCreatorCreditOpen(open) {
+  elements.creatorCredit.classList.toggle("is-flipped", open);
+  elements.creatorCredit.setAttribute("aria-expanded", String(open));
+  elements.creatorCreditText.setAttribute("aria-hidden", String(!open));
+  elements.creatorCredit.setAttribute("aria-label", open ? "Built by Elham Aboutorabi. Hide creator credit" : "Show creator credit");
+  elements.creatorCredit.title = open ? "Hide creator credit" : "Show creator credit";
+}
+
+elements.creatorCredit.addEventListener("click", () => {
+  setCreatorCreditOpen(elements.creatorCredit.getAttribute("aria-expanded") !== "true");
+});
+
+elements.creatorCredit.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    setCreatorCreditOpen(false);
+  }
 });
 
 elements.themeToggle.addEventListener("click", () => {

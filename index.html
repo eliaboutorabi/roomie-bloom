@@ -13,7 +13,7 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/driver.js@1.3.6/dist/driver.css"
     />
-    <link rel="stylesheet" href="./styles.css?v=left-sidebar" />
+    <link rel="stylesheet" href="./styles.css?v=flip-credit" />
   </head>
   <body>
     <main class="app-shell">
@@ -213,7 +213,6 @@
         </section>
 
         <footer class="app-footer">
-        <p>Built by <strong>Elham Aboutorabi</strong></p>
         <a
           class="repo-link"
           href="https://github.com/eliaboutorabi/roomie-bloom"
@@ -231,6 +230,26 @@
         </footer>
       </div>
     </main>
+
+    <button
+      class="creator-credit"
+      id="creator-credit"
+      type="button"
+      aria-label="Show creator credit"
+      aria-expanded="false"
+      aria-controls="creator-credit-text"
+      title="Show creator credit"
+    >
+      <span class="creator-credit-inner">
+        <span class="creator-credit-front" aria-hidden="true">
+          <i data-lucide="dollar-sign"></i>
+        </span>
+        <span class="creator-credit-back" id="creator-credit-text" aria-hidden="true">
+          <span>Built by</span>
+          <strong>Elham Aboutorabi</strong>
+        </span>
+      </span>
+    </button>
 
     <template id="expense-template">
       <article class="expense-item">
@@ -253,6 +272,6 @@
 
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/driver.js@1.3.6/dist/driver.js.iife.js"></script>
-    <script src="./app.js?v=phone-layout"></script>
+    <script src="./app.js?v=flip-credit"></script>
   </body>
 </html>
