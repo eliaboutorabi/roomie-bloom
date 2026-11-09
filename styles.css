@@ -1,14 +1,14 @@
 :root {
   --ink: #000;
   --muted: #34302a;
-  --paper: #fffdf6;
+  --paper: #fdfbff;
   --panel: rgba(255, 255, 255, 0.94);
   --line: rgba(32, 28, 22, 0.1);
-  --rose: #ffd166;
-  --coral: #f2b84b;
+  --rose: #b994ed;
+  --coral: #9c66d4;
   --teal: #3aa99e;
   --mint: #e6f7ed;
-  --yellow: #ffd166;
+  --purple: #b994ed;
   --lavender: #ece7f3;
   --shadow: 0 14px 38px rgba(49, 42, 29, 0.1);
   color-scheme: light;
@@ -28,7 +28,7 @@ body {
   min-height: 100vh;
   margin: 0;
   color: var(--ink);
-  background: linear-gradient(180deg, #fff7dc 0%, #fffdf6 42%, #f7faf5 100%);
+  background: linear-gradient(180deg, #f4edff 0%, #fcfbff 42%, #f7faf8 100%);
 }
 
 body.is-dark {
@@ -115,7 +115,7 @@ body.is-dark .sidebar-nav a {
   border-radius: 8px;
   color: #000;
   font-weight: 850;
-  background: #ffd166;
+  background: var(--purple);
 }
 
 .sidebar-brand strong,
@@ -159,7 +159,7 @@ body.is-dark .sidebar-nav a {
 .sidebar-nav a:focus-visible,
 .sidebar-nav a[aria-current="page"] {
   color: #000;
-  background: rgba(255, 209, 102, 0.22);
+  background: rgba(185, 148, 237, 0.22);
   outline: none;
 }
 
@@ -167,7 +167,7 @@ body.is-dark .sidebar-nav a:hover,
 body.is-dark .sidebar-nav a:focus-visible,
 body.is-dark .sidebar-nav a[aria-current="page"] {
   color: #fff;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(185, 148, 237, 0.2);
 }
 
 .app-content {
@@ -454,7 +454,7 @@ input[type="file"]::file-selector-button {
   color: #000;
   font: inherit;
   font-weight: 760;
-  background: rgba(255, 209, 102, 0.38);
+  background: var(--purple);
   cursor: pointer;
 }
 
@@ -484,7 +484,7 @@ select:focus {
 .toggle-row input {
   width: 18px;
   height: 18px;
-  accent-color: var(--yellow);
+  accent-color: var(--purple);
 }
 
 .money-input {
@@ -522,8 +522,8 @@ select:focus {
 
 .primary-button {
   color: #000;
-  background: #ffd166;
-  box-shadow: 0 8px 18px rgba(255, 193, 71, 0.18);
+  background: var(--purple);
+  box-shadow: 0 8px 18px rgba(185, 148, 237, 0.18);
 }
 
 .ghost-button {
@@ -590,12 +590,12 @@ svg {
   padding: 14px;
   border-radius: 8px;
   color: #000;
-  background: rgba(255, 209, 102, 0.18);
+  background: rgba(185, 148, 237, 0.18);
 }
 
 body.is-dark .balance-card {
   color: #fff;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(185, 148, 237, 0.14);
 }
 
 body.is-dark .balance-card p:last-child {
@@ -672,7 +672,7 @@ body.is-dark .app-footer {
   position: absolute;
   inset: 0 0 auto;
   height: 3px;
-  background: #ffd166;
+  background: var(--purple);
 }
 
 .mini-card.coral {
@@ -687,7 +687,7 @@ body.is-dark .mini-card.teal {
   background: rgba(255, 255, 255, 0.08);
 }
 
-body.is-dark .mini-card.yellow {
+body.is-dark .mini-card.purple {
   background: rgba(255, 255, 255, 0.08);
 }
 
@@ -703,7 +703,7 @@ body.is-dark .mini-card.lavender {
   background: #3aa99e;
 }
 
-.mini-card.yellow {
+.mini-card.purple {
   background: rgba(255, 255, 255, 0.9);
 }
 
@@ -781,10 +781,10 @@ body.is-dark .mini-card.lavender {
   left: 0;
   width: 52px;
   height: 52px;
-  border: 1px solid #e7ac36;
+  border: 1px solid #9c66d4;
   border-radius: 50%;
   color: #000;
-  background: #ffd166;
+  background: var(--purple);
   opacity: 1;
 }
 
@@ -847,7 +847,7 @@ body.is-dark .creator-credit-back {
   font-size: 0.9rem;
   font-weight: 700;
   text-decoration: none;
-  background: rgba(255, 209, 102, 0.18);
+  background: rgba(185, 148, 237, 0.18);
   transition:
     transform 160ms ease,
     box-shadow 160ms ease,
@@ -918,8 +918,8 @@ body.is-dark .search-box {
 }
 
 .expense-item.is-editing {
-  border-color: rgba(255, 209, 102, 0.82);
-  box-shadow: 0 8px 18px rgba(255, 193, 71, 0.14);
+  border-color: rgba(185, 148, 237, 0.82);
+  box-shadow: 0 8px 18px rgba(185, 148, 237, 0.14);
 }
 
 .expense-icon {
@@ -934,7 +934,7 @@ body.is-dark .search-box {
 
 .payment-item .expense-icon {
   color: #000;
-  background: rgba(255, 209, 102, 0.18);
+  background: rgba(185, 148, 237, 0.18);
 }
 
 .expense-item h3 {
@@ -969,7 +969,7 @@ body.is-dark .search-box {
   color: #000;
   font-size: 0.75rem;
   font-weight: 700;
-  background: rgba(255, 209, 102, 0.2);
+  background: rgba(185, 148, 237, 0.2);
 }
 
 .reminder-pill.is-done {

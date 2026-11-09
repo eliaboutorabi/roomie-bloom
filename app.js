@@ -366,7 +366,7 @@ function renderSummary() {
   elements.roommatePaidCards.replaceChildren(
     ...state.people.map((person, index) => {
       const card = document.createElement("article");
-      const palette = ["teal", "yellow", "coral", "lavender"][index % 4];
+      const palette = ["teal", "purple", "coral", "lavender"][index % 4];
       const icon = document.createElement("div");
       const iconGlyph = document.createElement("i");
       const label = document.createElement("p");
@@ -878,7 +878,7 @@ function showReminder(entry) {
   if ("Notification" in window && Notification.permission === "granted") {
     new Notification("Roomie Bloom alarm", {
       body: message,
-      icon: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23ffd166'/%3E%3Ctext x='32' y='42' font-size='34' text-anchor='middle'%3E%24%3C/text%3E%3C/svg%3E",
+      icon: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23b994ed'/%3E%3Ctext x='32' y='42' font-size='34' text-anchor='middle'%3E%24%3C/text%3E%3C/svg%3E",
     });
     return;
   }
