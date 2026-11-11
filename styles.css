@@ -802,8 +802,8 @@ body.is-dark .mini-card.lavender {
   padding: 8px 12px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: var(--paper);
-  color: #c05600;
+  background: #fdfbff;
+  color: #000;
   transform: scaleX(-1);
   opacity: 0;
 }
@@ -821,6 +821,7 @@ body.is-dark .mini-card.lavender {
 }
 
 .creator-credit-back strong {
+  color: #7540ab;
   font-size: 0.9rem;
   white-space: nowrap;
 }
@@ -828,10 +829,6 @@ body.is-dark .mini-card.lavender {
 .creator-credit:focus-visible {
   outline: 3px solid var(--teal);
   outline-offset: 4px;
-}
-
-body.is-dark .creator-credit-back {
-  color: #ff9f43;
 }
 
 .repo-link {
