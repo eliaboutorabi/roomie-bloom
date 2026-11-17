@@ -8,6 +8,7 @@ const MAX_RECEIPT_SIZE = 1_500_000;
 const state = loadState();
 const reminderTimers = new Map();
 let editingExpenseId = null;
+let editingExpenseName = null;
 
 const elements = {
   roommatesForm: document.querySelector("#roommates-form"),
@@ -19,7 +20,16 @@ const elements = {
   paidToField: document.querySelector("#expense-paid-to-field"),
   expenseForm: document.querySelector("#expense-form"),
   expenseTitle: document.querySelector("#expense-title"),
+  expenseTitleField: document.querySelector("#expense-title-field"),
   expenseTitleLabel: document.querySelector("#expense-title-label"),
+  expenseNamePicker: document.querySelector("#expense-name-picker"),
+  expenseNamePickerField: document.querySelector("#expense-name-picker-field"),
+  expenseNamesForm: document.querySelector("#expense-names-form"),
+  savedExpenseName: document.querySelector("#saved-expense-name"),
+  saveExpenseNameText: document.querySelector("#save-expense-name-text"),
+  cancelExpenseName: document.querySelector("#cancel-expense-name"),
+  expenseNamesList: document.querySelector("#expense-names-list"),
+  expenseNamesStatus: document.querySelector("#expense-names-status"),
   expenseAmount: document.querySelector("#expense-amount"),
   expenseDate: document.querySelector("#expense-date"),
   receiptFile: document.querySelector("#receipt-file"),
@@ -67,6 +77,7 @@ function loadState() {
   const fallback = {
     people: ["Eli", "bahar"],
     expenses: [],
+    expenseNames: [],
   };
 
   try {
@@ -75,6 +86,7 @@ function loadState() {
       return fallback;
     }
     saved.people = normalizePeople(saved.people, fallback.people);
+    saved.expenseNames = normalizeExpenseNames(saved.expenseNames);
     if (saved.people[0] === "Maya" && saved.people[1] === "Lily") {
       saved.people = fallback.people;
       saved.expenses = saved.expenses.map((entry) => ({
@@ -104,6 +116,25 @@ function saveState() {
 function normalizePeople(people, fallback = ["Eli", "bahar"]) {
   const cleaned = people.map((person) => String(person || "").trim()).filter(Boolean);
   return cleaned.length >= 2 ? cleaned : fallback;
+}
+
+function normalizeExpenseName(name) {
+  return name.trim().replace(/\s+/g, " ");
+}
+
+function normalizeExpenseNames(names) {
+  if (!Array.isArray(names)) {
+    return [];
+  }
+  const seen = new Set();
+  return names.filter((name) => typeof name === "string").map(normalizeExpenseName).filter((name) => {
+    const key = name.toLowerCase();
+    if (!name || seen.has(key)) {
+      return false;
+    }
+    seen.add(key);
+    return true;
+  });
 }
 
 function formatMoney(value) {
@@ -283,11 +314,99 @@ function createRoommateField(name = "", index = 0) {
   return row;
 }
 
+function updateExpenseNameFields() {
+  const isPaymentMode = elements.transactionType.value === "payment";
+  const showPicker = !isPaymentMode && state.expenseNames.length > 0;
+  const showInput = !showPicker || elements.expenseNamePicker.value === "custom";
+  elements.expenseNamePickerField.classList.toggle("is-hidden", !showPicker);
+  elements.expenseNamePicker.disabled = !showPicker;
+  elements.expenseNamePicker.required = showPicker;
+  elements.expenseTitleField.classList.toggle("is-hidden", !showInput);
+  elements.expenseTitle.required = showInput;
+  elements.expenseTitleLabel.textContent = isPaymentMode
+    ? "What is this payment for?"
+    : showPicker ? "Expense name" : "What was it?";
+}
+
+function renderExpenseNamePicker() {
+  const title = elements.expenseTitle.value;
+  const customWasSelected = elements.expenseNamePicker.value === "custom";
+  const placeholder = new Option("Choose an expense", "");
+  placeholder.disabled = true;
+  placeholder.defaultSelected = true;
+  elements.expenseNamePicker.replaceChildren(
+    placeholder,
+    ...state.expenseNames.map((name, index) => new Option(name, String(index))),
+    new Option("Other...", "custom"),
+  );
+  const selectedIndex = state.expenseNames.indexOf(title);
+  elements.expenseNamePicker.value = selectedIndex >= 0
+    ? String(selectedIndex)
+    : title || customWasSelected ? "custom" : "";
+  updateExpenseNameFields();
+}
+
+function renderExpenseNames() {
+  elements.expenseNamesList.replaceChildren();
+  if (!state.expenseNames.length) {
+    const empty = document.createElement("li");
+    empty.className = "expense-names-empty";
+    empty.textContent = "No saved expense names.";
+    elements.expenseNamesList.append(empty);
+    return;
+  }
+  state.expenseNames.forEach((name) => {
+    const row = document.createElement("li");
+    const label = document.createElement("span");
+    const actions = document.createElement("div");
+    row.className = "expense-name-row";
+    row.dataset.name = name;
+    label.className = "expense-name-label";
+    label.textContent = name;
+    actions.className = "expense-name-actions";
+    [
+      ["use", "arrow-up-right", `Use ${name} in an expense`],
+      ["edit", "pencil", `Edit ${name}`],
+      ["delete", "trash-2", `Delete ${name}`],
+    ].forEach(([action, iconName, description]) => {
+      const button = document.createElement("button");
+      const icon = document.createElement("i");
+      button.type = "button";
+      button.className = "icon-button";
+      button.dataset.action = action;
+      button.setAttribute("aria-label", description);
+      button.title = description;
+      icon.dataset.lucide = iconName;
+      button.append(icon);
+      actions.append(button);
+    });
+    row.append(label, actions);
+    elements.expenseNamesList.append(row);
+  });
+}
+
+function resetExpenseNameForm() {
+  editingExpenseName = null;
+  elements.expenseNamesForm.reset();
+  elements.savedExpenseName.setCustomValidity("");
+  elements.saveExpenseNameText.textContent = "Add name";
+  elements.cancelExpenseName.classList.add("is-hidden");
+}
+
+function refreshExpenseNames() {
+  saveState();
+  renderExpenseNames();
+  renderExpenseNamePicker();
+  if (window.lucide) {
+    window.lucide.createIcons();
+  }
+}
+
 function renderTransactionMode() {
   const isPaymentMode = elements.transactionType.value === "payment";
   elements.paidToField.classList.toggle("is-hidden", !isPaymentMode);
   elements.paidTo.required = isPaymentMode;
-  elements.expenseTitleLabel.textContent = isPaymentMode ? "What is this payment for?" : "What was it?";
+  renderExpenseNamePicker();
   elements.expenseTitle.placeholder = isPaymentMode ? "Venmo payback, rent settle-up..." : "Groceries, candles, brunch...";
   document.querySelector("#add-button-text").textContent = editingExpenseId
     ? "Save changes"
@@ -531,6 +650,7 @@ function renderExpenses() {
 
 function render() {
   renderPeople();
+  renderExpenseNames();
   renderSummary();
   renderExpenses();
   renderEditMode();
@@ -541,6 +661,78 @@ function render() {
     window.lucide.createIcons();
   }
 }
+
+elements.expenseNamesForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const name = normalizeExpenseName(elements.savedExpenseName.value);
+  const duplicate = state.expenseNames.some((existing) =>
+    existing !== editingExpenseName && existing.toLowerCase() === name.toLowerCase(),
+  );
+  if (!name || duplicate) {
+    elements.savedExpenseName.setCustomValidity(duplicate ? "This expense name is already saved." : "Enter an expense name.");
+    elements.savedExpenseName.reportValidity();
+    return;
+  }
+  const wasEditing = editingExpenseName !== null;
+  if (wasEditing) {
+    state.expenseNames = state.expenseNames.map((existing) => existing === editingExpenseName ? name : existing);
+  } else {
+    state.expenseNames.push(name);
+  }
+  resetExpenseNameForm();
+  refreshExpenseNames();
+  elements.expenseNamesStatus.textContent = `${wasEditing ? "Updated" : "Added"}: ${name}`;
+  elements.savedExpenseName.focus();
+});
+
+elements.savedExpenseName.addEventListener("input", () => {
+  elements.savedExpenseName.setCustomValidity("");
+  elements.expenseNamesStatus.textContent = "";
+});
+
+elements.cancelExpenseName.addEventListener("click", () => {
+  resetExpenseNameForm();
+  elements.expenseNamesStatus.textContent = "";
+});
+
+elements.expenseNamesList.addEventListener("click", (event) => {
+  const button = event.target.closest("button[data-action]");
+  if (!button) {
+    return;
+  }
+  const name = button.closest(".expense-name-row").dataset.name;
+  if (button.dataset.action === "use") {
+    elements.transactionType.value = "expense";
+    elements.expenseTitle.value = name;
+    renderTransactionMode();
+    setActiveView("add");
+    elements.expenseAmount.focus();
+  } else if (button.dataset.action === "edit") {
+    editingExpenseName = name;
+    elements.savedExpenseName.value = name;
+    elements.savedExpenseName.setCustomValidity("");
+    elements.saveExpenseNameText.textContent = "Save changes";
+    elements.cancelExpenseName.classList.remove("is-hidden");
+    elements.expenseNamesStatus.textContent = "";
+    elements.savedExpenseName.focus();
+  } else if (button.dataset.action === "delete") {
+    state.expenseNames = state.expenseNames.filter((existing) => existing !== name);
+    if (editingExpenseName === name) {
+      resetExpenseNameForm();
+    }
+    refreshExpenseNames();
+    elements.expenseNamesStatus.textContent = `Removed: ${name}`;
+  }
+});
+
+elements.expenseNamePicker.addEventListener("change", () => {
+  const selection = elements.expenseNamePicker.value;
+  elements.expenseTitle.value = selection === "custom" ? "" : state.expenseNames[Number(selection)] || "";
+  updateExpenseNameFields();
+  if (selection === "custom") {
+    elements.expenseTitle.focus();
+  }
+});
 
 elements.roommatesForm.addEventListener("submit", (event) => {
   event.preventDefault();

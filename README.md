@@ -6,6 +6,7 @@ A colorful, phone-friendly utility app for two roommates to track shared expense
 
 - Two-roommate setup with editable names
 - Shared expense entry with amount, payer, and date
+- Saved expense names with add, rename, and remove controls, available in the "What was it?" dropdown
 - Instant total, per-person paid amounts, and settle-up balance
 - Expense history with delete and clear controls
 - First-time walkthrough powered by Driver.js

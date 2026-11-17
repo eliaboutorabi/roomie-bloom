@@ -13,7 +13,7 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/driver.js@1.3.6/dist/driver.css"
     />
-    <link rel="stylesheet" href="./styles.css?v=purple-credit" />
+    <link rel="stylesheet" href="./styles.css?v=expense-names" />
   </head>
   <body>
     <main class="app-shell">
@@ -38,6 +38,10 @@
           <a href="#expense-panel" data-view="add" aria-current="page" title="Add expense">
             <i data-lucide="badge-plus"></i>
             <span class="nav-label">Add</span>
+          </a>
+          <a href="#expense-names-panel" data-view="expense-names" title="Expense names">
+            <i data-lucide="list-tree"></i>
+            <span class="nav-label">Expense names</span>
           </a>
           <a href="#summary-panel" data-view="summary" title="Summary">
             <i data-lucide="chart-no-axes-column"></i>
@@ -103,6 +107,30 @@
           </div>
         </aside>
 
+        <section class="panel setup-panel view-section" id="expense-names-panel" data-view-panel="expense-names">
+          <div class="panel-heading">
+            <div>
+              <p class="section-kicker"><i data-lucide="list-tree"></i> Expense names</p>
+              <h2><i data-lucide="tags"></i> Saved expense names</h2>
+            </div>
+          </div>
+          <form id="expense-names-form" class="stacked-form">
+            <label>
+              <span class="label-title"><i data-lucide="tag"></i> Name</span>
+              <input id="saved-expense-name" type="text" placeholder="Rent, groceries, electricity..." maxlength="80" autocomplete="off" required />
+            </label>
+            <button class="primary-button" type="submit">
+              <i data-lucide="save"></i>
+              <span id="save-expense-name-text">Add name</span>
+            </button>
+            <button class="ghost-button is-hidden" id="cancel-expense-name" type="button">
+              <i data-lucide="x"></i> Cancel edit
+            </button>
+          </form>
+          <p id="expense-names-status" class="expense-names-status" role="status"></p>
+          <ul class="expense-names-list" id="expense-names-list"></ul>
+        </section>
+
         <section class="panel expense-panel view-section is-active" id="expense-panel" data-view-panel="add">
           <div class="panel-heading">
             <div>
@@ -122,7 +150,11 @@
                 <option value="payment">Roommate payment</option>
               </select>
             </label>
-            <label class="wide">
+            <label class="wide is-hidden" id="expense-name-picker-field">
+              <span class="label-title"><i data-lucide="tag"></i> What was it?</span>
+              <select id="expense-name-picker" disabled></select>
+            </label>
+            <label class="wide" id="expense-title-field">
               <span class="label-title"><i data-lucide="tag"></i> <span id="expense-title-label">What was it?</span></span>
               <input
                 id="expense-title"
@@ -272,6 +304,6 @@
 
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/driver.js@1.3.6/dist/driver.js.iife.js"></script>
-    <script src="./app.js?v=purple-theme"></script>
+    <script src="./app.js?v=expense-names"></script>
   </body>
 </html>

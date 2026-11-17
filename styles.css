@@ -331,6 +331,48 @@ body.is-dark .bill-photo-card {
   width: 100%;
 }
 
+.expense-names-status {
+  min-height: 1.5em;
+  margin: 12px 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+  overflow-wrap: anywhere;
+}
+
+.expense-names-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.expense-name-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+}
+
+.expense-name-label {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: 1rem;
+  font-weight: 650;
+}
+
+.expense-name-actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: 6px;
+}
+
+.expense-names-empty {
+  padding: 16px 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
 .expense-panel {
   max-width: 760px;
 }
@@ -427,6 +469,10 @@ select {
   color: var(--ink);
   background: rgba(255, 255, 255, 0.84);
   outline: none;
+}
+
+select {
+  height: 44px;
 }
 
 body.is-dark input,
@@ -1160,6 +1206,16 @@ body.is-dark .search-box {
 }
 
 @media (max-width: 560px) {
+  .expense-name-row {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .expense-name-actions {
+    justify-content: flex-end;
+  }
+
   h2 {
     font-size: 1.125rem;
     line-height: 1.3;
@@ -1258,7 +1314,7 @@ body.is-dark .search-box {
   }
 }
 
-@media (max-height: 420px) {
+@media (max-height: 480px) {
   .app-shell {
     padding-bottom: 24px;
   }
