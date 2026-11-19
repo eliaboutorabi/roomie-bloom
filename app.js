@@ -9,6 +9,7 @@ const state = loadState();
 const reminderTimers = new Map();
 let editingExpenseId = null;
 let editingExpenseName = null;
+let activeSetupView = "roommates";
 
 const elements = {
   roommatesForm: document.querySelector("#roommates-form"),
@@ -54,6 +55,9 @@ const elements = {
   sidebar: document.querySelector(".app-sidebar"),
   sidebarLinks: document.querySelectorAll(".sidebar-nav [data-view]"),
   viewPanels: document.querySelectorAll("[data-view-panel]"),
+  setupTabs: document.querySelector("#setup-tabs"),
+  setupTabButtons: document.querySelectorAll("[data-setup-view]"),
+  setupPanels: document.querySelectorAll("[data-setup-panel]"),
 };
 
 function applyTheme(theme) {
@@ -174,7 +178,21 @@ function hasReceipt(entry) {
 }
 
 function setActiveView(view, updateHash = true) {
-  const nextView = [...elements.viewPanels].some((panel) => panel.dataset.viewPanel === view) ? view : "add";
+  const setupPanel = [...elements.setupPanels].find((panel) => panel.dataset.setupPanel === view);
+  const requestedView = setupPanel ? "setup" : view;
+  const nextView = [...elements.viewPanels].some((panel) => panel.dataset.viewPanel === requestedView) ? requestedView : "add";
+
+  if (setupPanel) {
+    activeSetupView = view;
+  }
+  elements.setupPanels.forEach((panel) => {
+    panel.hidden = panel.dataset.setupPanel !== activeSetupView;
+  });
+  elements.setupTabButtons.forEach((tab) => {
+    const selected = tab.dataset.setupView === activeSetupView;
+    tab.setAttribute("aria-selected", String(selected));
+    tab.tabIndex = selected ? 0 : -1;
+  });
 
   elements.viewPanels.forEach((panel) => {
     panel.classList.toggle("is-active", panel.dataset.viewPanel === nextView);
@@ -192,7 +210,9 @@ function setActiveView(view, updateHash = true) {
   if (updateHash) {
     const activeLink = [...elements.sidebarLinks].find((link) => link.dataset.view === nextView);
     if (activeLink) {
-      history.replaceState(null, "", activeLink.getAttribute("href"));
+      const selectedSetupPanel = [...elements.setupPanels].find((panel) => panel.dataset.setupPanel === activeSetupView);
+      const hash = nextView === "setup" ? `#${selectedSetupPanel.id}` : activeLink.getAttribute("href");
+      history.replaceState(null, "", hash);
     }
   }
 
@@ -200,6 +220,10 @@ function setActiveView(view, updateHash = true) {
 }
 
 function viewFromHash(hash) {
+  const setupPanel = [...elements.setupPanels].find((panel) => `#${panel.id}` === hash);
+  if (setupPanel) {
+    return setupPanel.dataset.setupPanel;
+  }
   const link = [...elements.sidebarLinks].find((item) => item.getAttribute("href") === hash);
   return link?.dataset.view || "add";
 }
@@ -913,6 +937,28 @@ elements.sidebar.addEventListener("click", (event) => {
   event.preventDefault();
   setActiveView(link.dataset.view);
 });
+
+elements.setupTabs.addEventListener("click", (event) => {
+  const tab = event.target.closest("[data-setup-view]");
+  if (tab) {
+    setActiveView(tab.dataset.setupView);
+  }
+});
+
+elements.setupTabs.addEventListener("keydown", (event) => {
+  const tabs = [...elements.setupTabButtons];
+  const index = tabs.indexOf(event.target);
+  if (index < 0 || !["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) {
+    return;
+  }
+  event.preventDefault();
+  const nextIndex = event.key === "Home" ? 0
+    : event.key === "End" ? tabs.length - 1
+    : (index + (event.key === "ArrowRight" ? 1 : -1) + tabs.length) % tabs.length;
+  setActiveView(tabs[nextIndex].dataset.setupView);
+  tabs[nextIndex].focus();
+});
+
 elements.paidBy.addEventListener("change", () => {
   if (elements.transactionType.value === "payment") {
     fillPaymentRecipientSelect();

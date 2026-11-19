@@ -13,7 +13,7 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/driver.js@1.3.6/dist/driver.css"
     />
-    <link rel="stylesheet" href="./styles.css?v=expense-names" />
+    <link rel="stylesheet" href="./styles.css?v=grouped-setup" />
   </head>
   <body>
     <main class="app-shell">
@@ -31,17 +31,13 @@
           </button>
         </div>
         <nav class="sidebar-nav">
-          <a href="#roommates-panel" data-view="roommates" title="Roommates">
-            <i data-lucide="users-round"></i>
-            <span class="nav-label">Roommates</span>
-          </a>
           <a href="#expense-panel" data-view="add" aria-current="page" title="Add expense">
             <i data-lucide="badge-plus"></i>
             <span class="nav-label">Add</span>
           </a>
-          <a href="#expense-names-panel" data-view="expense-names" title="Expense names">
-            <i data-lucide="list-tree"></i>
-            <span class="nav-label">Expense names</span>
+          <a href="#setup-panel" data-view="setup" title="Setup">
+            <i data-lucide="settings-2"></i>
+            <span class="nav-label">Setup</span>
           </a>
           <a href="#summary-panel" data-view="summary" title="Summary">
             <i data-lucide="chart-no-axes-column"></i>
@@ -71,7 +67,17 @@
         </section>
 
         <section class="workspace" aria-label="Expense tracker">
-        <aside class="panel setup-panel view-section" id="roommates-panel" data-view-panel="roommates">
+        <section class="setup-view view-section" id="setup-panel" data-view-panel="setup" aria-labelledby="setup-title">
+          <h2 class="setup-title" id="setup-title"><i data-lucide="settings-2"></i> Setup</h2>
+          <div class="setup-tabs" id="setup-tabs" role="tablist" aria-label="Setup">
+            <button id="roommates-tab" type="button" role="tab" data-setup-view="roommates" aria-controls="roommates-panel" aria-selected="true">
+              <i data-lucide="users-round"></i><span>Roommates</span>
+            </button>
+            <button id="expense-names-tab" type="button" role="tab" data-setup-view="expense-names" aria-controls="expense-names-panel" aria-selected="false" tabindex="-1">
+              <i data-lucide="list-tree"></i><span>Expense names</span>
+            </button>
+          </div>
+        <section class="panel setup-panel" id="roommates-panel" data-setup-panel="roommates" role="tabpanel" aria-labelledby="roommates-tab">
           <div class="panel-heading">
             <div>
               <p class="section-kicker">
@@ -105,9 +111,9 @@
             <h3 id="balance-title">All even</h3>
             <p id="balance-detail">Add an expense to see who owes what.</p>
           </div>
-        </aside>
+        </section>
 
-        <section class="panel setup-panel view-section" id="expense-names-panel" data-view-panel="expense-names">
+        <section class="panel setup-panel" id="expense-names-panel" data-setup-panel="expense-names" role="tabpanel" aria-labelledby="expense-names-tab" hidden>
           <div class="panel-heading">
             <div>
               <p class="section-kicker"><i data-lucide="list-tree"></i> Expense names</p>
@@ -129,6 +135,7 @@
           </form>
           <p id="expense-names-status" class="expense-names-status" role="status"></p>
           <ul class="expense-names-list" id="expense-names-list"></ul>
+        </section>
         </section>
 
         <section class="panel expense-panel view-section is-active" id="expense-panel" data-view-panel="add">
@@ -304,6 +311,6 @@
 
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/driver.js@1.3.6/dist/driver.js.iife.js"></script>
-    <script src="./app.js?v=expense-names"></script>
+    <script src="./app.js?v=grouped-setup"></script>
   </body>
 </html>
